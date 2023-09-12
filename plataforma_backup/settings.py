@@ -74,9 +74,17 @@ WSGI_APPLICATION = 'plataforma_backup.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+    'django': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'plataformabackup',
+        'USER': 'postgres',
+        'PASSWORD': 'ddsp1707',
+        'HOST': '10.100.65.65',
+        'PORT': '5432',
     }
 }
 
