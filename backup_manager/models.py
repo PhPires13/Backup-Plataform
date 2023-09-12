@@ -20,11 +20,11 @@ class Backup(models.Model):
     path = models.CharField(max_length=255)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    dt_create = models.DateTimeField(auto_now_add=True)
 
 
 class Restore(models.Model):
     name = models.CharField(max_length=255)
     origin_backup = models.ForeignKey(Backup, on_delete=models.CASCADE)
     destination_environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
-    restored_at = models.DateTimeField(auto_now_add=True)
+    dt_restore = models.DateTimeField(auto_now_add=True)
