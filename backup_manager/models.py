@@ -27,6 +27,8 @@ class Backup(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
     dt_create = models.DateTimeField(auto_now_add=True)
+    dt_start = models.DateTimeField()
+    dt_end = models.DateTimeField()
     status = models.BooleanField()
 
     class Meta:
