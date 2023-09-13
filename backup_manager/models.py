@@ -27,6 +27,7 @@ class Backup(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
     dt_create = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField()
 
     class Meta:
         db_table = 'tb_backup'
@@ -37,6 +38,7 @@ class Restore(models.Model):
     origin_backup = models.ForeignKey(Backup, on_delete=models.CASCADE)
     destination_environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
     dt_restore = models.DateTimeField(auto_now_add=True)
+    status = models.BooleanField()
 
     class Meta:
         db_table = 'tb_restore'
