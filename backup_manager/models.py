@@ -21,6 +21,15 @@ class Environment(models.Model):
         db_table = 'tb_environment'
 
 
+class Database(models.Model):
+    name = models.CharField(max_length=255)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'tb_database'
+
+
 class Backup(models.Model):
     name = models.CharField(max_length=255)
     path = models.CharField(max_length=255)
