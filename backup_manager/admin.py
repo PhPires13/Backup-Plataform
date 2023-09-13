@@ -23,7 +23,7 @@ admin.site.register(Environment, EnvironmentAdmin)
 
 
 class HostAdmin(admin.ModelAdmin):
-    list_display = ('name', 'ip')
+    list_display = ('name', 'ip', 'port')
     search_fields = ('name', 'ip')
 
 
