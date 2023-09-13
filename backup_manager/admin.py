@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib import admin
 
 from backup_manager.models import Environment, Project, Backup, Restore, Database, Host
@@ -32,10 +34,15 @@ admin.site.register(Host, HostAdmin)
 
 @admin.action(description='Create Backup')
 def create_backup(model_admin, request, queryset):
+    year = datetime.now().year
+    month = datetime.now().month
+    day = datetime.now().day
+    hour = datetime.now().hour
+    minute = datetime.now().minute
     for database in queryset:
         backup = Backup(
-            name='',
-            path='',
+            name='teste',
+            path=f'{database.project}_{database.name}_{day}-{month}-{year}-{hour}-{minute}.sql',
             project=database.project,
             environment=database.environment
         )
