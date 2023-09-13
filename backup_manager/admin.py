@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from backup_manager.models import Environment, Project, Backup, Restore, Database
+from backup_manager.models import Environment, Project, Backup, Restore, Database, Host
 
 
 # Register your models here.
@@ -15,16 +15,24 @@ admin.site.register(Project, ProjectAdmin)
 
 
 class EnvironmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'host_db', 'port_db', 'backup_path')
+    list_display = ('name', 'backup_path')
     search_fields = ('name', 'host_db')
 
 
 admin.site.register(Environment, EnvironmentAdmin)
 
 
+class HostAdmin(admin.ModelAdmin):
+    list_display = ('name', 'ip')
+    search_fields = ('name', 'ip')
+
+
+admin.site.register(Host, HostAdmin)
+
+
 class DatabaseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'project', 'environment')
-    search_fields = ('name', 'project__name', 'environment__name')
+    list_display = ('name', 'host', 'project', 'environment')
+    search_fields = ('name', 'host__name', 'project__name', 'environment__name')
 
 
 admin.site.register(Database, DatabaseAdmin)
