@@ -40,7 +40,7 @@ admin.site.register(Database, DatabaseAdmin)
 
 class BackupAdmin(admin.ModelAdmin):
     list_display = ('name', 'path', 'project', 'environment', 'dt_create', 'dt_start', 'dt_end', 'status')
-    search_fields = ('name', 'path', 'project__name', 'environment__name', 'dt_create')
+    search_fields = ('name', 'path', 'project__name', 'environment__name', 'dt_create', 'status')
 
 
 admin.site.register(Backup, BackupAdmin)
@@ -48,7 +48,7 @@ admin.site.register(Backup, BackupAdmin)
 
 class RestoreAdmin(admin.ModelAdmin):
     list_display = ('name', 'origin_backup', 'destination_environment', 'dt_restore', 'status')
-    search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_environment__name', 'dt_restore')
+    search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_environment__name', 'dt_restore', 'status')
 
 
 admin.site.register(Restore, RestoreAdmin)
