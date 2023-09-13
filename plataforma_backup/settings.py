@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'admin_interface',  # Custom Django Admin
+    'colorfield',  # Custom colors in Django Admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'backup_manager',
 ]
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'  # For custom colors in Django Admin
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
