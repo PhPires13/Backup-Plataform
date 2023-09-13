@@ -48,7 +48,7 @@ admin.site.register(Backup, BackupAdmin)
 
 class RestoreAdmin(admin.ModelAdmin):
     list_display = ('name', 'origin_backup', 'destination_environment', 'dt_restore', 'status')
-    search_fields = ('name', 'origin_backup__name', 'destination_environment__name')
+    search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_environment__name')
 
 
 admin.site.register(Restore, RestoreAdmin)
