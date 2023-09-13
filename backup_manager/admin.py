@@ -33,7 +33,13 @@ admin.site.register(Host, HostAdmin)
 @admin.action(description='Create Backup')
 def create_backup(model_admin, request, queryset):
     for database in queryset:
-        pass
+        backup = Backup(
+            name='',
+            path='',
+            project=database.project,
+            environment=database.environment
+        )
+        backup.save()
 
 
 class DatabaseAdmin(admin.ModelAdmin):
