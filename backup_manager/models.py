@@ -25,10 +25,21 @@ class Environment(models.Model):
         db_table = 'tb_environment'
 
 
+class Host(models.Model):
+    name = models.CharField(max_length=255)
+    ip = models.CharField(max_length=255)
+    port = models.IntegerField()
+
+    def __str__(self):
+        return f'{self.name} ({self.ip}:{self.port})'
+
+    class Meta:
+        db_table = 'tb_host'
+
+
 class Database(models.Model):
     name = models.CharField(max_length=255)
-    host = models.CharField(max_length=255)
-    port = models.IntegerField()
+    host = models.ForeignKey(Host, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
 
