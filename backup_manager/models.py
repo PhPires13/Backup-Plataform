@@ -45,8 +45,8 @@ class Backup(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
     dt_create = models.DateTimeField(auto_now_add=True)
-    dt_start = models.DateTimeField(null=True)
-    dt_end = models.DateTimeField(null=True)
+    dt_start = models.DateTimeField(null=True, blank=True)
+    dt_end = models.DateTimeField(null=True, blank=True)
     status = models.BooleanField(default=False)
 
     def __str__(self):
