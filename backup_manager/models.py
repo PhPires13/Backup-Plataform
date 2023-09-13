@@ -16,8 +16,6 @@ class Project(models.Model):
 
 class Environment(models.Model):
     name = models.CharField(max_length=255)
-    host_db = models.CharField(max_length=255)
-    port_db = models.IntegerField()
     backup_path = models.CharField(max_length=255)
 
     def __str__(self):
@@ -29,6 +27,8 @@ class Environment(models.Model):
 
 class Database(models.Model):
     name = models.CharField(max_length=255)
+    host = models.CharField(max_length=255)
+    port = models.IntegerField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
 
