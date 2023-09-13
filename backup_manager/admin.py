@@ -30,9 +30,16 @@ class HostAdmin(admin.ModelAdmin):
 admin.site.register(Host, HostAdmin)
 
 
+@admin.action(description='Create Backup')
+def create_backup(model_admin, request, queryset):
+    for database in queryset:
+        pass
+
+
 class DatabaseAdmin(admin.ModelAdmin):
     list_display = ('name', 'host', 'project', 'environment')
     search_fields = ('name', 'host__name', 'project__name', 'environment__name')
+    actions = [create_backup]
 
 
 admin.site.register(Database, DatabaseAdmin)
