@@ -7,6 +7,9 @@ class Project(models.Model):
     name = models.CharField(max_length=255)
     backup_path = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'tb_project'
 
@@ -17,6 +20,9 @@ class Environment(models.Model):
     port_db = models.IntegerField()
     backup_path = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'tb_environment'
 
@@ -25,6 +31,9 @@ class Database(models.Model):
     name = models.CharField(max_length=255)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.name} ({self.project.name} - {self.environment.name})'
 
     class Meta:
         db_table = 'tb_database'
@@ -40,6 +49,9 @@ class Backup(models.Model):
     dt_end = models.DateTimeField(null=True)
     status = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f'{self.name} ({self.project.name} - {self.environment.name}) [{self.dt_create}]'
+
     class Meta:
         db_table = 'tb_backup'
 
@@ -50,6 +62,9 @@ class Restore(models.Model):
     destination_environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
     dt_restore = models.DateTimeField(auto_now_add=True)
     status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.name} (({self.origin_backup.name}) -> {self.destination_environment.name}) [{self.dt_restore}]'
 
     class Meta:
         db_table = 'tb_restore'
