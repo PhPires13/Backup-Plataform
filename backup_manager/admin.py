@@ -49,6 +49,7 @@ def create_backup(model_admin, request, queryset):
 class DatabaseAdmin(admin.ModelAdmin):
     list_display = ('name', 'host', 'project', 'environment')
     search_fields = ('name', 'host__name', 'project__name', 'environment__name')
+    autocomplete_fields = ('host', 'project', 'environment')
     actions = [create_backup]
 
 
@@ -58,6 +59,7 @@ admin.site.register(Database, DatabaseAdmin)
 class BackupAdmin(admin.ModelAdmin):
     list_display = ('name', 'path', 'project', 'environment', 'dt_create', 'dt_start', 'dt_end', 'status')
     search_fields = ('name', 'path', 'project__name', 'environment__name', 'dt_create', 'status')
+    autocomplete_fields = ('project', 'environment')
 
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = ('dt_start', 'dt_end', 'status')
@@ -71,6 +73,7 @@ admin.site.register(Backup, BackupAdmin)
 class RestoreAdmin(admin.ModelAdmin):
     list_display = ('name', 'origin_backup', 'destination_environment', 'dt_create', 'dt_start', 'dt_end', 'status')
     search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_environment__name', 'dt_start', 'status')
+    autocomplete_fields = ('origin_backup', 'destination_environment')
 
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = ('dt_start', 'dt_end', 'status')
