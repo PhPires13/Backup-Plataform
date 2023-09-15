@@ -77,7 +77,7 @@ class Restore(models.Model):
     status = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.name} (({self.origin_backup.name}) -> {self.destination_environment.name}) [{self.dt_create}]'
+        return f'{self.name} (({self.origin_backup}) -> {self.destination_environment.name}) [{self.dt_create}]'
 
     class Meta:
         db_table = 'tb_restore'
