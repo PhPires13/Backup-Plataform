@@ -55,7 +55,7 @@ class Backup(models.Model):
     name = models.CharField(max_length=255)
     path = models.CharField(max_length=255)
     database = models.ForeignKey(Database, on_delete=models.CASCADE)
-    dt_create = models.DateTimeField(help_text='If it is manually set, means the backup has already been done')
+    dt_create = models.DateTimeField(blank=True, help_text='If it is manually set, means the backup has already been done')
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
     status = models.BooleanField(default=False)
@@ -72,7 +72,9 @@ class Backup(models.Model):
 
         date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
 
-        self.name = f'{self.database.project.name}_{self.database.environment.name}_{date_time}'
+        if not self.name:
+            self.name = f'{self.database.project.name}_{self.database.environment.name}_{date_time}'
+
         self.path = f'{self.database.project.name}_{self.database.name}_{date_time}.sql'
         super().save(*args, **kwargs)
 
