@@ -75,6 +75,10 @@ class BackupAdmin(admin.ModelAdmin):
         form = super(BackupAdmin, self).get_form(request, obj, **kwargs)
         return form
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        # TODO: start backup
+
 
 admin.site.register(Backup, BackupAdmin)
 
