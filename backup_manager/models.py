@@ -18,7 +18,6 @@ class Project(models.Model):
 
 class Environment(models.Model):
     name = models.CharField(max_length=255)
-    backup_path = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name

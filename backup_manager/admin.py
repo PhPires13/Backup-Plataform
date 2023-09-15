@@ -17,7 +17,7 @@ admin.site.register(Project, ProjectAdmin)
 
 
 class EnvironmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'backup_path')
+    list_display = ('name',)
     search_fields = ('name', 'host_db')
 
 
