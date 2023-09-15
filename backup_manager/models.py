@@ -55,16 +55,23 @@ class Backup(models.Model):
     name = models.CharField(max_length=255)
     path = models.CharField(max_length=255)
     database = models.ForeignKey(Database, on_delete=models.CASCADE)
-    dt_create = models.DateTimeField(auto_now_add=True)
+    dt_create = models.DateTimeField(help_text='If it is manually set, means the backup has already been done')
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
-    status = models.BooleanField(default=True)
+    status = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.name} ({self.database}) [{self.dt_create}]'
 
     def save(self, *args, **kwargs):
-        date_time: str = datetime.now().strftime('%d-%m-%Y-%H-%M')
+        # If the creation date has an already been set
+        if not self.dt_create:
+            self.dt_create = datetime.now()
+        else:
+            self.status = True  # The backup is already done
+
+        date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
+
         self.name = f'{self.database.project.name}_{self.database.environment.name}_{date_time}'
         self.path = f'{self.database.project.name}_{self.database.name}_{date_time}.sql'
         super().save(*args, **kwargs)
