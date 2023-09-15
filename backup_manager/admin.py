@@ -55,8 +55,8 @@ admin.site.register(Database, DatabaseAdmin)
 
 
 class BackupAdminForm(forms.ModelForm):
-    user = forms.CharField(max_length=255, help_text='User with permission to perform backup')
-    password = forms.CharField(max_length=255, widget=forms.PasswordInput, help_text='Password of user with permission to perform backup')
+    user = forms.CharField(max_length=255, required=False, help_text='User with permission to perform backup')
+    password = forms.CharField(max_length=255, widget=forms.PasswordInput, required=False, help_text='Password of user with permission to perform backup')
 
     class Meta:
         model = Backup
