@@ -85,14 +85,14 @@ class Backup(models.Model):
 class Restore(models.Model):
     name = models.CharField(max_length=255)
     origin_backup = models.ForeignKey(Backup, on_delete=models.CASCADE)
-    destination_environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
+    destination_database = models.ForeignKey(Database, on_delete=models.CASCADE)
     dt_create = models.DateTimeField(auto_now_add=True)
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
     status = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.name} (({self.origin_backup}) -> {self.destination_environment.name}) [{self.dt_create}]'
+        return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_create}]'
 
     class Meta:
         db_table = 'tb_restore'

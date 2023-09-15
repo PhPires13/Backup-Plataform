@@ -67,9 +67,9 @@ admin.site.register(Backup, BackupAdmin)
 
 
 class RestoreAdmin(admin.ModelAdmin):
-    list_display = ('name', 'origin_backup', 'destination_environment', 'dt_create', 'dt_start', 'dt_end', 'status')
-    search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_environment__name', 'dt_start', 'status')
-    autocomplete_fields = ('origin_backup', 'destination_environment')
+    list_display = ('name', 'origin_backup', 'destination_database', 'dt_create', 'dt_start', 'dt_end', 'status')
+    search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_database__name', 'dt_start', 'status')
+    autocomplete_fields = ('origin_backup', 'destination_database')
 
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = ('dt_start', 'dt_end', 'status')
