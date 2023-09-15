@@ -34,15 +34,11 @@ admin.site.register(Host, HostAdmin)
 
 @admin.action(description='Create Backup')
 def create_backup(model_admin, request, queryset):
-    year = datetime.now().year
-    month = datetime.now().month
-    day = datetime.now().day
-    hour = datetime.now().hour
-    minute = datetime.now().minute
+    dt: str = datetime.now().strftime('%d-%m-%Y-%H-%M')
     for database in queryset:
         backup = Backup(
             name='teste',
-            path=f'{database.project}_{database.name}_{day}-{month}-{year}-{hour}-{minute}.sql',
+            path=f'{database.project}_{database.name}_{dt}.sql',
             project=database.project,
             environment=database.environment,
             status=False
