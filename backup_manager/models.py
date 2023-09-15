@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from django.db import models
@@ -62,6 +63,12 @@ class Backup(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.database}) [{self.dt_create}]'
+
+    def backup_path(backup: 'Backup') -> str:
+        default = os.path.join('/', 'mnt', 'netapp01', 'postgres')
+        month_year = backup.dt_create.strftime('%m-%Y')
+        path = os.path.join(default, backup.database.environment.name, month_year, backup.database.project.name, backup.path)
+        return path
 
     def save(self, *args, **kwargs):
         # If the creation date has an already been set
