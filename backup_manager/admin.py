@@ -37,8 +37,6 @@ def create_backup(model_admin, request, queryset):
     dt: str = datetime.now().strftime('%d-%m-%Y-%H-%M')
     for database in queryset:
         backup = Backup(
-            name=f'{database.project}_{database.environment.name}_{dt}',
-            path=f'{database.project}_{database.name}_{dt}.sql',
             database=database,
             status=False
         )

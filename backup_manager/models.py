@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 
 # Create your models here.
@@ -61,6 +63,12 @@ class Backup(models.Model):
 
     def __str__(self):
         return f'{self.name} ({self.database}) [{self.dt_create}]'
+
+    def save(self, *args, **kwargs):
+        date_time: str = datetime.now().strftime('%d-%m-%Y-%H-%M')
+        self.name = f'{self.database.project.name}_{self.database.environment.name}_{date_time}'
+        self.path = f'{self.database.project.name}_{self.database.name}_{date_time}.sql'
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'tb_backup'
