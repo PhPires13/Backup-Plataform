@@ -71,7 +71,9 @@ class Restore(models.Model):
     name = models.CharField(max_length=255)
     origin_backup = models.ForeignKey(Backup, on_delete=models.CASCADE)
     destination_environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
-    dt_restore = models.DateTimeField(auto_now_add=True)
+    dt_create = models.DateTimeField(auto_now_add=True)
+    dt_start = models.DateTimeField(null=True, blank=True)
+    dt_end = models.DateTimeField(null=True, blank=True)
     status = models.BooleanField(default=False)
 
     def __str__(self):
