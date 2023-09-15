@@ -52,7 +52,7 @@ class Database(models.Model):
 
 
 class Backup(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "{project.name}_{environment.name}_{date_time}"')
     path = models.CharField(max_length=255)
     database = models.ForeignKey(Database, on_delete=models.CASCADE)
     dt_create = models.DateTimeField(blank=True, help_text='If it is manually set, means the backup has already been done')
