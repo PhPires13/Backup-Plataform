@@ -61,7 +61,7 @@ class BackupAdmin(admin.ModelAdmin):
     autocomplete_fields = ('database',)
 
     def get_form(self, request, obj=None, **kwargs):
-        self.exclude = ('dt_start', 'dt_end', 'status')
+        self.exclude = ('path', 'dt_start', 'dt_end', 'status')
         form = super(BackupAdmin, self).get_form(request, obj, **kwargs)
         return form
 
