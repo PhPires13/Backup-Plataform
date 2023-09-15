@@ -59,6 +59,11 @@ class BackupAdmin(admin.ModelAdmin):
     list_display = ('name', 'path', 'project', 'environment', 'dt_create', 'dt_start', 'dt_end', 'status')
     search_fields = ('name', 'path', 'project__name', 'environment__name', 'dt_create', 'status')
 
+    def get_form(self, request, obj=None, **kwargs):
+        self.exclude = ('dt_start', 'dt_end', 'status')
+        form = super(BackupAdmin, self).get_form(request, obj, **kwargs)
+        return form
+
 
 admin.site.register(Backup, BackupAdmin)
 
