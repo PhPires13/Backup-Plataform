@@ -9,7 +9,7 @@ from backup_manager.models import Environment, Project, Backup, Restore, Databas
 
 
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'backup_path')
+    list_display = ('name',)
     search_fields = ('name',)
 
 
