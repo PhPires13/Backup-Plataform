@@ -44,7 +44,8 @@ def create_backup(model_admin, request, queryset):
             name='teste',
             path=f'{database.project}_{database.name}_{day}-{month}-{year}-{hour}-{minute}.sql',
             project=database.project,
-            environment=database.environment
+            environment=database.environment,
+            status=False
         )
         backup.save()
 

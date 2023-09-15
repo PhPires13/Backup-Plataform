@@ -58,7 +58,7 @@ class Backup(models.Model):
     dt_create = models.DateTimeField(auto_now_add=True)
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.name} ({self.project.name} - {self.environment.name}) [{self.dt_create}]'
