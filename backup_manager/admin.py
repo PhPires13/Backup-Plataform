@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.contrib import admin
+from django import forms
 
 from backup_manager.models import Environment, Project, Backup, Restore, Database, Host
 
@@ -40,20 +41,34 @@ class DatabaseAdmin(admin.ModelAdmin):
 
     @admin.action(description='Create Backup')
     def create_backup(self, request, queryset):
+        user = request.POST.get('user')
+        password = request.POST.get('password')
+
         for database in queryset:
             backup = Backup(
                 database=database
             )
-            backup.save()
+            backup.save(user, password)
 
 
 admin.site.register(Database, DatabaseAdmin)
+
+
+class BackupAdminForm(forms.ModelForm):
+    user = forms.CharField(max_length=255, help_text='User with permission to perform backup')
+    password = forms.CharField(max_length=255, widget=forms.PasswordInput, help_text='Password of user with permission to perform backup')
+
+    class Meta:
+        model = Backup
+        fields = '__all__'
 
 
 class BackupAdmin(admin.ModelAdmin):
     list_display = ('name', 'path', 'database', 'dt_create', 'dt_start', 'dt_end', 'status')
     search_fields = ('name', 'path', 'database', 'dt_create', 'status')
     autocomplete_fields = ('database',)
+
+    form = BackupAdminForm
 
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = ('path', 'dt_start', 'dt_end', 'status')
