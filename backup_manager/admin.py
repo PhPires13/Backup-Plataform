@@ -39,8 +39,7 @@ def create_backup(model_admin, request, queryset):
         backup = Backup(
             name=f'{database.project}_{database.environment.name}_{dt}',
             path=f'{database.project}_{database.name}_{dt}.sql',
-            project=database.project,
-            environment=database.environment,
+            database=database,
             status=False
         )
         backup.save()
@@ -57,9 +56,9 @@ admin.site.register(Database, DatabaseAdmin)
 
 
 class BackupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'path', 'project', 'environment', 'dt_create', 'dt_start', 'dt_end', 'status')
-    search_fields = ('name', 'path', 'project__name', 'environment__name', 'dt_create', 'status')
-    autocomplete_fields = ('project', 'environment')
+    list_display = ('name', 'path', 'database', 'dt_create', 'dt_start', 'dt_end', 'status')
+    search_fields = ('name', 'path', 'database', 'dt_create', 'status')
+    autocomplete_fields = ('database',)
 
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = ('dt_start', 'dt_end', 'status')
