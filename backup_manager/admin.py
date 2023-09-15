@@ -72,5 +72,10 @@ class RestoreAdmin(admin.ModelAdmin):
     list_display = ('name', 'origin_backup', 'destination_environment', 'dt_restore', 'status')
     search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_environment__name', 'dt_restore', 'status')
 
+    def get_form(self, request, obj=None, **kwargs):
+        self.exclude = ('dt_restore', 'status')
+        form = super(RestoreAdmin, self).get_form(request, obj, **kwargs)
+        return form
+
 
 admin.site.register(Restore, RestoreAdmin)
