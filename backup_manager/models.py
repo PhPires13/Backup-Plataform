@@ -55,7 +55,7 @@ class Backup(models.Model):
     name = models.CharField(max_length=255, blank=True, help_text='Default: "{project.name}_{environment.name}_{date_time}"')
     path = models.CharField(max_length=255)
     database = models.ForeignKey(Database, on_delete=models.CASCADE)
-    dt_create = models.DateTimeField(blank=True, help_text='_blank_ if the backup is to be done now')
+    dt_create = models.DateTimeField(blank=True, help_text='Leave it _blank_ if the backup is to be done now')
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
     status = models.BooleanField(default=False)
