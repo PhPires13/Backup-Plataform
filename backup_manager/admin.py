@@ -34,7 +34,6 @@ admin.site.register(Host, HostAdmin)
 
 @admin.action(description='Create Backup')
 def create_backup(model_admin, request, queryset):
-    dt: str = datetime.now().strftime('%d-%m-%Y-%H-%M')
     for database in queryset:
         backup = Backup(
             database=database
