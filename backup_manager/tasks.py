@@ -23,17 +23,19 @@ def perform_backup(backup: Backup, user: str, password: str):
         database.name
     ]
 
+    backup.set_status('ST')
+    backup.dt_start = datetime.now()
+    backup.save()
+
     # Run the pg_dump command
     try:
-        backup.dt_start = datetime.now()
-        backup.save()
         result = subprocess.run(command, input=password.encode(), check=True, text=True)
         # Set the status and end time after a successful backup
-        backup.status = True
+        backup.set_status('SC')
         backup.description = result.stdout
     except subprocess.CalledProcessError as e:
         # Set the status and end time after a failed backup
-        backup.status = False
+        backup.set_status('FL')
         backup.description = e.stderr
 
     backup.dt_end = datetime.now()

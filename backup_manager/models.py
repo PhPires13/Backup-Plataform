@@ -97,7 +97,7 @@ class Backup(TaskModel):
         if not self.dt_create:
             self.dt_create = datetime.now()
         else:
-            self.status = True  # The backup is already done
+            self.set_status('SC')  # The backup is already done
 
         date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
 
