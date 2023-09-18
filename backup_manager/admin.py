@@ -95,5 +95,10 @@ class RestoreAdmin(admin.ModelAdmin):
         form = super(RestoreAdmin, self).get_form(request, obj, **kwargs)
         return form
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)  # Save the model
+        # Start the restore
+        tasks.perform_restore.delay(obj, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
+
 
 admin.site.register(Restore, RestoreAdmin)
