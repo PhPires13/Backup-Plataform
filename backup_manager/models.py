@@ -64,10 +64,10 @@ class Backup(models.Model):
     def __str__(self):
         return f'{self.name} ({self.database}) [{self.dt_create}]'
 
-    def backup_path(backup: 'Backup') -> str:
+    def backup_path(self) -> str:
         default = os.path.join('/', 'mnt', 'netapp01', 'postgres')
-        month_year = backup.dt_create.strftime('%m-%Y')
-        path = os.path.join(default, backup.database.environment.name, month_year, backup.database.project.name, backup.path)
+        month_year = self.dt_create.strftime('%m-%Y')
+        path = os.path.join(default, self.database.environment.name, month_year, self.database.project.name, self.path)
         return path
 
     def save(self, *args, **kwargs):
