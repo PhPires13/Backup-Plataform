@@ -51,6 +51,15 @@ class Database(models.Model):
         db_table = 'tb_database'
 
 
+# Possible status of a backup or restore
+STATUS_CHOICES = (
+    ('NS', 'Not Started'),
+    ('ST', 'Started'),
+    ('SC', 'Success'),
+    ('FL', 'Failed'),
+)
+
+
 class Backup(models.Model):
     name = models.CharField(max_length=255, blank=True, help_text='Default: "{project.name}_{environment.name}_{date_time}"')
     path = models.CharField(max_length=255)
@@ -58,7 +67,7 @@ class Backup(models.Model):
     dt_create = models.DateTimeField(blank=True, help_text='Leave it _blank_ if the backup is to be done now')
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
-    status = models.BooleanField(default=False)
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='NS')
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
@@ -96,7 +105,7 @@ class Restore(models.Model):
     dt_create = models.DateTimeField(auto_now_add=True)
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
-    status = models.BooleanField(default=False)
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='NS')
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
