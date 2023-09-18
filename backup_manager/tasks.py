@@ -30,6 +30,10 @@ def run_command(obj, command: list, password: str):
 
 @shared_task
 def perform_backup(backup: Backup, user: str, password: str):
+    # Verify if the backup is not already done
+    if backup.status != 'NS':
+        return
+
     host = backup.database.host
     database = backup.database
 
