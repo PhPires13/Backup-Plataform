@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 
+from django.core.exceptions import ValidationError
 from django.db import models
 
 # Create your models here.
@@ -118,6 +119,13 @@ class Restore(TaskModel):
 
     def __str__(self):
         return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_create}] {{{self.status}}}'
+
+    def clean(self, *args, **kwargs):
+        super().clean()
+
+        # Check if the origin and destination databases are of the same project
+        if self.origin_backup.database.project != self.destination_database.project:
+            raise ValidationError(f'Origin and destination databases must be of the same project')
 
     class Meta:
         db_table = 'tb_restore'
