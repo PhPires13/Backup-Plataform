@@ -3,6 +3,7 @@ from datetime import datetime
 from django.contrib import admin
 from django import forms
 
+from backup_manager import tasks
 from backup_manager.models import Environment, Project, Backup, Restore, Database, Host
 
 
@@ -76,8 +77,9 @@ class BackupAdmin(admin.ModelAdmin):
         return form
 
     def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-        # TODO: start backup, form.cleaned_data.get('user'), form.cleaned_data.get('password')
+        super().save_model(request, obj, form, change)  # Save the model
+        # Start the backup
+        tasks.perform_backup.delay(obj, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
 
 
 admin.site.register(Backup, BackupAdmin)
