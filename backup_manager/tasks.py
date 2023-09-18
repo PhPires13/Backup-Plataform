@@ -7,5 +7,5 @@ def perform_backup(database: Database):
     pass
 
 
-def perform_restore(origin_backup: Backup, setination_database: Database):
+def perform_restore(origin_backup: Backup, destination_database: Database):
     pass
