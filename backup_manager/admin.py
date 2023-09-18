@@ -85,10 +85,21 @@ class BackupAdmin(admin.ModelAdmin):
 admin.site.register(Backup, BackupAdmin)
 
 
+class RestoreAdminForm(forms.ModelForm):
+    user = forms.CharField(max_length=255, required=False, help_text='User with permission to perform restore')
+    password = forms.CharField(max_length=255, widget=forms.PasswordInput, required=False, help_text='Password of user with permission to perform restore')
+
+    class Meta:
+        model = Restore
+        fields = '__all__'
+
+
 class RestoreAdmin(admin.ModelAdmin):
     list_display = ('name', 'origin_backup', 'destination_database', 'dt_create', 'dt_start', 'dt_end', 'status', 'description')
     search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_database__name', 'dt_start', 'status')
     autocomplete_fields = ('origin_backup', 'destination_database')
+
+    form = RestoreAdminForm
 
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = ('dt_start', 'dt_end', 'status', 'description')
