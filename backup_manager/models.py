@@ -84,7 +84,7 @@ class Backup(TaskModel):
     dt_create = models.DateTimeField(blank=True, help_text='Leave it _blank_ if the backup is to be done now')
 
     def __str__(self):
-        return f'{self.name} ({self.database}) [{self.dt_create}]'
+        return f'{self.name} ({self.database}) [{self.dt_create}] {{{self.status}}}'
 
     def complete_path(self) -> str:
         default = os.path.join('/', 'mnt', 'netapp01', 'postgres')
@@ -117,7 +117,7 @@ class Restore(TaskModel):
     destination_database = models.ForeignKey(Database, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_create}]'
+        return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_create}] {{{self.status}}}'
 
     class Meta:
         db_table = 'tb_restore'
