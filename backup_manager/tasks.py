@@ -1,11 +1,11 @@
 import os
 
-from backup_manager.models import Database, Backup
+from backup_manager.models import Database, Backup, Restore
 
 
-def perform_backup(database: Database):
+def perform_backup(backup: Backup, user: str, password: str):
     pass
 
 
-def perform_restore(origin_backup: Backup, destination_database: Database):
+def perform_restore(restore: Restore, user: str, password: str):
     pass
