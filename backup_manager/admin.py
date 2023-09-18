@@ -78,8 +78,10 @@ class BackupAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)  # Save the model
-        # Start the backup
-        tasks.perform_backup.delay(obj, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
+        # Verify if the status is not 'Not Started'
+        if obj.status == 'NS':
+            # Start the backup
+            tasks.perform_backup.delay(obj, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
 
 
 admin.site.register(Backup, BackupAdmin)
