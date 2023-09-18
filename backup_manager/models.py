@@ -60,6 +60,23 @@ STATUS_CHOICES = (
 )
 
 
+class Task(models.Model):
+    dt_create = models.DateTimeField(auto_now_add=True)
+    dt_start = models.DateTimeField(null=True, blank=True)
+    dt_end = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='NS')
+    description = models.TextField(null=True, blank=True)
+
+    def set_status(self, choice: str = ''):
+        if choice not in [status[0] for status in STATUS_CHOICES]:
+            raise ValueError(f'Invalid status: {choice}')
+
+        self.status = choice
+
+    class Meta:
+        abstract = True
+
+
 class Backup(models.Model):
     name = models.CharField(max_length=255, blank=True, help_text='Default: "{project.name}_{environment.name}_{date_time}"')
     path = models.CharField(max_length=255)
