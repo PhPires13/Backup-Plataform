@@ -29,7 +29,9 @@ def run_command(obj, command: list, password: str):
 
 
 @shared_task
-def perform_backup(backup: Backup, user: str, password: str):
+def perform_backup(backup_id: int, user: str, password: str):
+    backup = Backup.objects.get(id=backup_id)  # Get the backup object
+
     # Verify if the backup is not already done
     if backup.status != 'NS':
         return
@@ -52,7 +54,9 @@ def perform_backup(backup: Backup, user: str, password: str):
 
 
 @shared_task
-def perform_restore(restore: Restore, user: str, password: str):
+def perform_restore(restore_id: int, user: str, password: str):
+    restore = Restore.objects.get(id=restore_id)  # Get the restore object
+
     origin_backup = restore.origin_backup
     destination_database = restore.destination_database
 
