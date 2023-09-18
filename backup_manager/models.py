@@ -59,6 +59,7 @@ class Backup(models.Model):
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
     status = models.BooleanField(default=False)
+    description = models.TextField(blank=True)
 
     def __str__(self):
         return f'{self.name} ({self.database}) [{self.dt_create}]'
@@ -96,6 +97,7 @@ class Restore(models.Model):
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
     status = models.BooleanField(default=False)
+    description = models.TextField(blank=True)
 
     def __str__(self):
         return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_create}]'
