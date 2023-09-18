@@ -60,7 +60,7 @@ STATUS_CHOICES = (
 )
 
 
-class Task(models.Model):
+class TaskModel(models.Model):
     dt_create = models.DateTimeField(auto_now_add=True)
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
