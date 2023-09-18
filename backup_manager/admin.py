@@ -65,14 +65,14 @@ class BackupAdminForm(forms.ModelForm):
 
 
 class BackupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'path', 'database', 'dt_create', 'dt_start', 'dt_end', 'status')
+    list_display = ('name', 'path', 'database', 'dt_create', 'dt_start', 'dt_end', 'status', 'description')
     search_fields = ('name', 'path', 'database', 'dt_create', 'status')
     autocomplete_fields = ('database',)
 
     form = BackupAdminForm
 
     def get_form(self, request, obj=None, **kwargs):
-        self.exclude = ('path', 'dt_start', 'dt_end', 'status')
+        self.exclude = ('path', 'dt_start', 'dt_end', 'status', 'description')
         form = super(BackupAdmin, self).get_form(request, obj, **kwargs)
         return form
 
@@ -86,12 +86,12 @@ admin.site.register(Backup, BackupAdmin)
 
 
 class RestoreAdmin(admin.ModelAdmin):
-    list_display = ('name', 'origin_backup', 'destination_database', 'dt_create', 'dt_start', 'dt_end', 'status')
+    list_display = ('name', 'origin_backup', 'destination_database', 'dt_create', 'dt_start', 'dt_end', 'status', 'description')
     search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_database__name', 'dt_start', 'status')
     autocomplete_fields = ('origin_backup', 'destination_database')
 
     def get_form(self, request, obj=None, **kwargs):
-        self.exclude = ('dt_start', 'dt_end', 'status')
+        self.exclude = ('dt_start', 'dt_end', 'status', 'description')
         form = super(RestoreAdmin, self).get_form(request, obj, **kwargs)
         return form
 
