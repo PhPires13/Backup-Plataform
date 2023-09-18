@@ -77,15 +77,11 @@ class TaskModel(models.Model):
         abstract = True
 
 
-class Backup(models.Model):
+class Backup(TaskModel):
     name = models.CharField(max_length=255, blank=True, help_text='Default: "{project.name}_{environment.name}_{date_time}"')
     path = models.CharField(max_length=255)
     database = models.ForeignKey(Database, on_delete=models.CASCADE)
     dt_create = models.DateTimeField(blank=True, help_text='Leave it _blank_ if the backup is to be done now')
-    dt_start = models.DateTimeField(null=True, blank=True)
-    dt_end = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='NS')
-    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.name} ({self.database}) [{self.dt_create}]'
@@ -115,15 +111,10 @@ class Backup(models.Model):
         db_table = 'tb_backup'
 
 
-class Restore(models.Model):
+class Restore(TaskModel):
     name = models.CharField(max_length=255)
     origin_backup = models.ForeignKey(Backup, on_delete=models.CASCADE)
     destination_database = models.ForeignKey(Database, on_delete=models.CASCADE)
-    dt_create = models.DateTimeField(auto_now_add=True)
-    dt_start = models.DateTimeField(null=True, blank=True)
-    dt_end = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='NS')
-    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_create}]'
