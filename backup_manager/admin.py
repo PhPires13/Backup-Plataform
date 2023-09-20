@@ -89,7 +89,11 @@ class RestoreAdminForm(forms.ModelForm):
 
 class RestoreAdmin(admin.ModelAdmin):
     def truncated_description(self, obj):
-        return obj.description[:250] + '...' if obj.description else ''
+        size = 250
+        if len(obj.description) > size:
+            return obj.description[:size] + '...' if obj.description else ''
+        else:
+            return obj.description
 
     list_display = ('name', 'origin_backup', 'destination_database', 'dt_create', 'dt_start', 'dt_end', 'status', 'truncated_description')
     search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_database__name', 'dt_start', 'status')
