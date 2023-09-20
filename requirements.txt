@@ -1,0 +1,5 @@
+celery==5.3.4
+Django==4.2.5
+django-admin-interface==0.26.1
+redis==4.6.0
+gevent==23.9.1
