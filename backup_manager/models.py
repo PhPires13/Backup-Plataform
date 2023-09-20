@@ -59,6 +59,7 @@ class STATUS(Enum):
     STARTED = 'ST'
     SUCCESS = 'SC'
     FAILED = 'FL'
+    MANUAL = 'MN'
 
 
 STATUS_CHOICES = (
@@ -66,6 +67,7 @@ STATUS_CHOICES = (
     (STATUS.STARTED.value, STATUS.STARTED.name),
     (STATUS.SUCCESS.value, STATUS.SUCCESS.name),
     (STATUS.FAILED.value, STATUS.FAILED.name),
+    (STATUS.MANUAL.value, STATUS.MANUAL.name),
 )
 
 
@@ -106,7 +108,7 @@ class Backup(TaskModel):
         if not self.dt_create:
             self.dt_create = datetime.now()
         else:
-            self.set_status(STATUS.SUCCESS.value)  # The backup is already done
+            self.set_status(STATUS.MANUAL.value)  # The backup is already done
 
         date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
 
