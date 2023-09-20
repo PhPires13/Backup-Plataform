@@ -13,6 +13,8 @@ def run_command(obj, command: list, password: str):
     obj.dt_start = datetime.now()
     obj.save()
 
+    os.environ['PGPASSWORD'] = password
+
     # Run the command
     try:
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=password, check=True, encoding='utf-8')
@@ -49,7 +51,6 @@ def perform_backup(backup_id: int, user: str, password: str):
         '-h', host.ip,
         '-p', str(host.port),
         '-U', user,
-        '-W', password,
         '--dbname', database.name,
         '--file', backup.complete_path(),
     ]
@@ -72,7 +73,6 @@ def perform_restore(restore_id: int, user: str, password: str):
         '-h', host.ip,
         '-p', str(host.port),
         '-U', user,
-        '-W', password,
         '--dbname', destination_database.name,
         origin_backup.complete_path()
     ]
