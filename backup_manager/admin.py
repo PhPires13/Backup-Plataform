@@ -90,7 +90,7 @@ class RestoreAdmin(admin.ModelAdmin):
 
     form = RestoreAdminForm
 
-    def add_form(self, request, form_url='', extra_context=None):
+    def add_view(self, request, form_url='', extra_context=None):
         self.exclude = ('dt_start', 'dt_end', 'status', 'description')
         return super(RestoreAdmin, self).add_view(request, form_url, extra_context)
 
