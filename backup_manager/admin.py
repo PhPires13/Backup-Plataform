@@ -64,7 +64,7 @@ class BackupAdmin(admin.ModelAdmin):
         return super(BackupAdmin, self).add_view(request, form_url, extra_context)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
-        self.exclude = ('user', 'password')
+        self.exclude = ()
         return super(BackupAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
@@ -99,7 +99,7 @@ class RestoreAdmin(admin.ModelAdmin):
         return super(RestoreAdmin, self).add_view(request, form_url, extra_context)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
-        self.exclude = ('user', 'password')
+        self.exclude = ()
         return super(RestoreAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
