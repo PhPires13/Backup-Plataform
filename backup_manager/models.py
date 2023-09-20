@@ -104,6 +104,8 @@ class Backup(TaskModel):
         return path
 
     def save(self, *args, **kwargs):
+        date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
+
         if not self.pk:  # If the object is being created
             # If the creation date has an already been set
             if not self.dt_create:
@@ -111,12 +113,12 @@ class Backup(TaskModel):
             else:
                 self.set_status(STATUS.MANUAL.value)  # The backup is already done
 
-        date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
+            self.path = f'{self.database.project.name}_{self.database.name}_{date_time}.sql'  # Set the path
 
+        # If the name is blank, set default
         if not self.name:
             self.name = f'{self.database.project.name}_{self.database.environment.name}_{date_time}'
 
-        self.path = f'{self.database.project.name}_{self.database.name}_{date_time}.sql'
         super().save(*args, **kwargs)
 
     class Meta:
