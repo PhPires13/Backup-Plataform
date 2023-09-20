@@ -37,7 +37,7 @@ def perform_backup(backup_id: int, user: str, password: str):
     backup = Backup.objects.get(id=backup_id)  # Get the backup object
 
     # Verify if the backup is not already done
-    if backup.status != STATUS.NOT_STARTED.value:
+    if backup.status != STATUS.PENDING.value:
         return
 
     host = backup.database.host

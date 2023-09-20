@@ -55,7 +55,7 @@ class Database(models.Model):
 
 # Possible status of a backup or restore
 class STATUS(Enum):
-    NOT_STARTED = 'NS'
+    PENDING = 'PD'
     STARTED = 'ST'
     SUCCESS = 'SC'
     FAILED = 'FL'
@@ -63,7 +63,7 @@ class STATUS(Enum):
 
 
 STATUS_CHOICES = (
-    (STATUS.NOT_STARTED.value, STATUS.NOT_STARTED.name),
+    (STATUS.PENDING.value, STATUS.PENDING.name),
     (STATUS.STARTED.value, STATUS.STARTED.name),
     (STATUS.SUCCESS.value, STATUS.SUCCESS.name),
     (STATUS.FAILED.value, STATUS.FAILED.name),
@@ -75,7 +75,7 @@ class TaskModel(models.Model):
     dt_create = models.DateTimeField(auto_now_add=True)
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=STATUS.NOT_STARTED.value)
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=STATUS.PENDING.value)
     description = models.TextField(null=True, blank=True)
 
     def set_status(self, choice: str = ''):
