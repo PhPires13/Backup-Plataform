@@ -59,10 +59,9 @@ class BackupAdmin(admin.ModelAdmin):
 
     form = BackupAdminForm
 
-    def get_form(self, request, obj=None, **kwargs):
+    def add_view(self, request, form_url='', extra_context=None):
         self.exclude = ('path', 'dt_start', 'dt_end', 'status', 'description')
-        form = super(BackupAdmin, self).get_form(request, obj, **kwargs)
-        return form
+        return super(BackupAdmin, self).add_view(request, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)  # Save the model
@@ -91,10 +90,9 @@ class RestoreAdmin(admin.ModelAdmin):
 
     form = RestoreAdminForm
 
-    def get_form(self, request, obj=None, **kwargs):
+    def add_form(self, request, form_url='', extra_context=None):
         self.exclude = ('dt_start', 'dt_end', 'status', 'description')
-        form = super(RestoreAdmin, self).get_form(request, obj, **kwargs)
-        return form
+        return super(RestoreAdmin, self).add_view(request, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)  # Save the model
