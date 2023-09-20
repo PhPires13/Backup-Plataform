@@ -49,6 +49,7 @@ def perform_backup(backup_id: int, user: str, password: str):
         '-h', host.ip,
         '-p', str(host.port),
         '-U', user,
+        '-W', password,
         database.name,
         '--file', backup.complete_path(),
     ]
@@ -71,6 +72,7 @@ def perform_restore(restore_id: int, user: str, password: str):
         '-h', host.ip,
         '-p', str(host.port),
         '-U', user,
+        '-W', password,
         '--dbname', destination_database.name,
         origin_backup.complete_path()
     ]
