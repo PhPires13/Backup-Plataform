@@ -23,6 +23,10 @@ def run_command(obj, command: list, password: str):
         # Set the status and description after a fail
         obj.set_status('FL')
         obj.description = e.stderr
+    except Exception as e:
+        # Set the status and description after a fail
+        obj.set_status('FL')
+        obj.description = str(e)
 
     obj.dt_end = datetime.now()  # Set the end date
     obj.save()
