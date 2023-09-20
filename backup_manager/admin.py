@@ -4,7 +4,7 @@ from django.contrib import admin
 from django import forms
 
 from backup_manager import tasks
-from backup_manager.models import Environment, Project, Backup, Restore, Database, Host
+from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS
 
 
 # Register your models here.
@@ -79,7 +79,7 @@ class BackupAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)  # Save the model
         # Verify if the status is not 'Not Started'
-        if obj.status == 'NS':
+        if obj.status == STATUS.PENDING.value:
             # Start the backup
             tasks.perform_backup.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
 
