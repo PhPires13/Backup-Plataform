@@ -89,6 +89,9 @@ class RestoreAdminForm(forms.ModelForm):
 
 class RestoreAdmin(admin.ModelAdmin):
     def truncated_description(self, obj):
+        if not obj.description:  # Verify if it is empty
+            return obj.description
+
         size = 300
         if len(obj.description) > size:
             return obj.description[:size+1] + '...' if obj.description else ''
