@@ -38,18 +38,6 @@ class DatabaseAdmin(admin.ModelAdmin):
     list_display = ('name', 'host', 'project', 'environment')
     search_fields = ('name', 'host__name', 'project__name', 'environment__name')
     autocomplete_fields = ('host', 'project', 'environment')
-    actions = ['create_backup']
-
-    @admin.action(description='Create Backup')
-    def create_backup(self, request, queryset):
-        user = request.POST.get('user')
-        password = request.POST.get('password')
-
-        for database in queryset:
-            backup = Backup(
-                database=database
-            )
-            backup.save(user, password)
 
 
 admin.site.register(Database, DatabaseAdmin)
