@@ -73,6 +73,12 @@ def perform_restore(restore_id: int, user: str, password: str):
 
     # Reset the destination database using Django's database management functions
     with connection.cursor() as cursor:
+        # Terminate all connections to the database
+        cursor.execute(f"""
+            SELECT pg_terminate_backend(pg_stat_activity.pid)
+            FROM pg_stat_activity
+            WHERE pg_stat_activity.datname = '{destination_database.name}' ;
+        """)
         cursor.execute(f'DROP DATABASE IF EXISTS {destination_database.name} ;')
         cursor.execute(f'CREATE DATABASE {destination_database.name} ;')
 
