@@ -15,7 +15,7 @@ def run_command(obj, command: list, password: str):
 
     # Run the command
     try:
-        result = subprocess.run(command, input=password.encode(), check=True, text=True)
+        result = subprocess.run(command, input=password.encode(), check=True, text=True, encoding='utf-8')
         # Set the status and description after a success
         obj.set_status(STATUS.SUCCESS.value)
         obj.description = result.stdout
