@@ -104,8 +104,10 @@ class RestoreAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)  # Save the model
-        # Start the restore
-        tasks.perform_restore.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
+        # Verify if the status is not 'Not Started'
+        if obj.status == STATUS.PENDING.value:
+            # Start the restore
+            tasks.perform_restore.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
 
 
 admin.site.register(Restore, RestoreAdmin)
