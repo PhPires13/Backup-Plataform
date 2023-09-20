@@ -104,11 +104,12 @@ class Backup(TaskModel):
         return path
 
     def save(self, *args, **kwargs):
-        # If the creation date has an already been set
-        if not self.dt_create:
-            self.dt_create = datetime.now()
-        else:
-            self.set_status(STATUS.MANUAL.value)  # The backup is already done
+        if not self.pk:  # If the object is being created
+            # If the creation date has an already been set
+            if not self.dt_create:
+                self.dt_create = datetime.now()
+            else:
+                self.set_status(STATUS.MANUAL.value)  # The backup is already done
 
         date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
 
