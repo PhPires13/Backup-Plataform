@@ -72,12 +72,12 @@ def perform_restore(restore_id: int, user: str, password: str):
 
     # Construct the pg_restore command
     command = [
-        'pg_restore',
+        'psql',
         '-h', host.ip,
         '-p', str(host.port),
         '-U', user,
         '--dbname', destination_database.name,
-        origin_backup.complete_path()
+        '--file', origin_backup.complete_path()
     ]
 
     run_command(restore, command, password)
