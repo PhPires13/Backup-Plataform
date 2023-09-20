@@ -57,7 +57,7 @@ class BackupAdmin(admin.ModelAdmin):
     search_fields = ('name', 'path', 'database', 'dt_create', 'status')
     autocomplete_fields = ('database',)
 
-    add_form = BackupAdminForm
+    form = BackupAdminForm
 
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = ('path', 'dt_start', 'dt_end', 'status', 'description')
@@ -92,7 +92,7 @@ class RestoreAdmin(admin.ModelAdmin):
     search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_database__name', 'dt_start', 'status')
     autocomplete_fields = ('origin_backup', 'destination_database')
 
-    add_form = RestoreAdminForm
+    form = RestoreAdminForm
 
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = ('dt_start', 'dt_end', 'status', 'description')
