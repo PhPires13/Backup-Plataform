@@ -63,6 +63,10 @@ class BackupAdmin(admin.ModelAdmin):
         self.exclude = ('path', 'dt_start', 'dt_end', 'status', 'description')
         return super(BackupAdmin, self).add_view(request, form_url, extra_context)
 
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        self.exclude = ('user', 'password')
+        return super(BackupAdmin, self).change_view(request, object_id, form_url, extra_context)
+
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)  # Save the model
         # Verify if the status is not 'Not Started'
@@ -93,6 +97,10 @@ class RestoreAdmin(admin.ModelAdmin):
     def add_view(self, request, form_url='', extra_context=None):
         self.exclude = ('dt_start', 'dt_end', 'status', 'description')
         return super(RestoreAdmin, self).add_view(request, form_url, extra_context)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        self.exclude = ('user', 'password')
+        return super(RestoreAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)  # Save the model
