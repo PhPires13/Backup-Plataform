@@ -50,7 +50,7 @@ def perform_backup(backup_id: int, user: str, password: str):
         '-p', str(host.port),
         '-U', user,
         '-W', password,
-        database.name,
+        '--dbname', database.name,
         '--file', backup.complete_path(),
     ]
 
