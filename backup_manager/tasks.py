@@ -9,7 +9,7 @@ from backup_manager.models import Database, Backup, Restore, STATUS
 
 def run_command(obj, command: list, password: str):
     # Set the status and description before running the command
-    obj.set_status('ST')
+    obj.set_status(STATUS.STARTED.value)
     obj.dt_start = datetime.now()
     obj.save()
 
