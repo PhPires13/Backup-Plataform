@@ -45,6 +45,9 @@ def perform_backup(backup_id: int, user: str, password: str):
     host = backup.database.host
     database = backup.database
 
+    # Create the directory structure if it doesn't exist
+    os.makedirs(os.path.dirname(backup.complete_path()), exist_ok=True)
+
     # Construct the pg_dump command
     command = [
         'pg_dump',
