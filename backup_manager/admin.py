@@ -82,6 +82,9 @@ class BackupAdmin(admin.ModelAdmin):
         if obj.status == STATUS.PENDING.value:
             # Start the backup
             tasks.perform_backup.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
+        else:
+            obj.description = 'Não ta pendente'
+            obj.save()
 
 
 admin.site.register(Backup, BackupAdmin)
