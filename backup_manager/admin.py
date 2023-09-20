@@ -89,9 +89,9 @@ class RestoreAdminForm(forms.ModelForm):
 
 class RestoreAdmin(admin.ModelAdmin):
     def truncated_description(self, obj):
-        size = 250
+        size = 300
         if len(obj.description) > size:
-            return obj.description[:size] + '...' if obj.description else ''
+            return obj.description[:size+1] + '...' if obj.description else ''
         else:
             return obj.description
 
@@ -118,3 +118,4 @@ class RestoreAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Restore, RestoreAdmin)
+
