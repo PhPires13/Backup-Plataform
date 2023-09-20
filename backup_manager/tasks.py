@@ -76,9 +76,10 @@ def perform_restore(restore_id: int, user: str, password: str):
         '-h', host.ip,
         '-p', str(host.port),
         '-U', user,
+        '-c', f'DROP DATABASE IF EXISTS {destination_database.name}',  # Drop the database if it exists
+        '-c', f'CREATE DATABASE {destination_database.name}',  # Create the database
         '--dbname', destination_database.name,
         '--file', origin_backup.complete_path(),
-        '--clean'
     ]
 
     run_command(restore, command, password)
