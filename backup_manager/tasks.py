@@ -78,6 +78,7 @@ def perform_restore(restore_id: int, user: str, password: str):
         '-U', user,
         '--dbname', destination_database.name,
         '--file', origin_backup.complete_path()
+        '--clean'
     ]
 
     run_command(restore, command, password)
