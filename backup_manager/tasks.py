@@ -3,6 +3,7 @@ import subprocess
 from datetime import datetime
 
 from celery import shared_task
+from django.db import connection
 
 from backup_manager.models import Database, Backup, Restore, STATUS
 
@@ -70,14 +71,17 @@ def perform_restore(restore_id: int, user: str, password: str):
 
     host = destination_database.host
 
+    # Reset the destination database using Django's database management functions
+    with connection.cursor() as cursor:
+        cursor.execute(f'DROP DATABASE IF EXISTS {destination_database.name} ;')
+        cursor.execute(f'CREATE DATABASE {destination_database.name} ;')
+
     # Construct the pg_restore command
     command = [
         'psql',
         '-h', host.ip,
         '-p', str(host.port),
         '-U', user,
-        '-c', f'DROP DATABASE IF EXISTS {destination_database.name};',  # Drop the database if it exists
-        '-c', f'CREATE DATABASE {destination_database.name};',  # Create the database
         '--dbname', destination_database.name,
         '--file', origin_backup.complete_path(),
     ]
