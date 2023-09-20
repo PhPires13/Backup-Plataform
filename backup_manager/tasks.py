@@ -4,7 +4,7 @@ from datetime import datetime
 
 from celery import shared_task
 
-from backup_manager.models import Database, Backup, Restore
+from backup_manager.models import Database, Backup, Restore, STATUS
 
 
 def run_command(obj, command: list, password: str):
@@ -17,15 +17,15 @@ def run_command(obj, command: list, password: str):
     try:
         result = subprocess.run(command, input=password.encode(), check=True, text=True)
         # Set the status and description after a success
-        obj.set_status('SC')
+        obj.set_status(STATUS.SUCCESS.value)
         obj.description = result.stdout
     except subprocess.CalledProcessError as e:
         # Set the status and description after a fail
-        obj.set_status('FL')
+        obj.set_status(STATUS.FAILED.value)
         obj.description = e.stderr
     except Exception as e:
         # Set the status and description after a fail
-        obj.set_status('FL')
+        obj.set_status(STATUS.FAILED.value)
         obj.description = str(e)
 
     obj.dt_end = datetime.now()  # Set the end date

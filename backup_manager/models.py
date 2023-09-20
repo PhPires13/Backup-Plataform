@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from enum import Enum
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -53,11 +54,18 @@ class Database(models.Model):
 
 
 # Possible status of a backup or restore
+class STATUS(Enum):
+    NOT_STARTED = 'NS'
+    STARTED = 'ST'
+    SUCCESS = 'SC'
+    FAILED = 'FL'
+
+
 STATUS_CHOICES = (
-    ('NS', 'Not Started'),
-    ('ST', 'Started'),
-    ('SC', 'Success'),
-    ('FL', 'Failed'),
+    (STATUS.NOT_STARTED.value, STATUS.NOT_STARTED.name),
+    (STATUS.STARTED.value, STATUS.STARTED.name),
+    (STATUS.SUCCESS.value, STATUS.SUCCESS.name),
+    (STATUS.FAILED.value, STATUS.FAILED.name),
 )
 
 
@@ -65,7 +73,7 @@ class TaskModel(models.Model):
     dt_create = models.DateTimeField(auto_now_add=True)
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='NS')
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=STATUS.NOT_STARTED.value)
     description = models.TextField(null=True, blank=True)
 
     def set_status(self, choice: str = ''):
@@ -98,7 +106,7 @@ class Backup(TaskModel):
         if not self.dt_create:
             self.dt_create = datetime.now()
         else:
-            self.set_status('SC')  # The backup is already done
+            self.set_status(STATUS.SUCCESS.value)  # The backup is already done
 
         date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
 
