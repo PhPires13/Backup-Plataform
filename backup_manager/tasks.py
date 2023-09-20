@@ -46,8 +46,8 @@ def perform_backup(backup_id: int, user: str, password: str):
         '-p', str(host.port),
         '-U', user,
         '--no-password',  # Use this flag to prompt for a password
+        database.name,
         '--file', backup.complete_path(),
-        database.name
     ]
 
     run_command(backup, command, password)
