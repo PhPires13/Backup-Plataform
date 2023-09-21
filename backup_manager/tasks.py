@@ -2,10 +2,23 @@ import os
 import subprocess
 from datetime import datetime
 
+import psycopg2
 from celery import shared_task
 from django.db import connection
 
 from backup_manager.models import Database, Backup, Restore, STATUS
+
+
+def database_connect(database: Database, user: str, password: str):
+    conn = psycopg2.connect(
+        host=database.host.ip,
+        port=database.host.port,
+        db_name=database.name,
+        user=user,
+        password=password,
+    )
+
+    return conn
 
 
 def run_command(obj, command: list, password: str):
@@ -71,21 +84,30 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
 
     host = destination_database.host
 
+    try:
+        cursor = connection.cursor()
+    except Exception as e:
+        # Set the status and description after a fail
+        restore.set_status(STATUS.FAILED.value)
+        restore.description = str(e)
+        restore.dt_end = datetime.now()
+        restore.save()
+        return
+
     if to_keep_old_data:
         try:
             # Rename all current schemas to schema_(datetime.now())
-            with connection.cursor() as cursor:
-                cursor.execute(f"""
-                SELECT schema_name
-                FROM information_schema.schemata
-                WHERE catalog_name = '{destination_database.name}'
-                AND schema_name NOT IN ('information_schema', 'pg_catalog', 'pg_toast') ;
-                """)
+            cursor.execute(f"""
+            SELECT schema_name
+            FROM information_schema.schemata
+            WHERE catalog_name = '{destination_database.name}'
+            AND schema_name NOT IN ('information_schema', 'pg_catalog', 'pg_toast') ;
+            """)
 
-                for row in cursor.fetchall():
-                    schema_name = row[0]
-                    # if schema_name != 'public':  # If want to ignore public schema
-                    cursor.execute(f"ALTER SCHEMA {schema_name} RENAME TO {schema_name}_{restore.dt_create.strftime('%d_%m_%Y_%H_%M')} ;")
+            for row in cursor.fetchall():
+                schema_name = row[0]
+                # if schema_name != 'public':  # If want to ignore public schema
+                cursor.execute(f"ALTER SCHEMA {schema_name} RENAME TO {schema_name}_{restore.dt_create.strftime('%d_%m_%Y_%H_%M')} ;")
         except Exception as e:
             # Set the status and description after a fail
             restore.set_status(STATUS.FAILED.value)
@@ -96,15 +118,14 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
     else:
         try:
             # Reset the destination database using Django's database management functions
-            with connection.cursor() as cursor:
-                # Terminate all connections to the database
-                cursor.execute(f"""
-                    SELECT pg_terminate_backend(pg_stat_activity.pid)
-                    FROM pg_stat_activity
-                    WHERE pg_stat_activity.datname = '{destination_database.name}' ;
-                """)
-                cursor.execute(f'DROP DATABASE IF EXISTS {destination_database.name} ;')
-                cursor.execute(f'CREATE DATABASE {destination_database.name} ;')
+            # Terminate all connections to the database
+            cursor.execute(f"""
+                SELECT pg_terminate_backend(pg_stat_activity.pid)
+                FROM pg_stat_activity
+                WHERE pg_stat_activity.datname = '{destination_database.name}' ;
+            """)
+            cursor.execute(f'DROP DATABASE IF EXISTS {destination_database.name} ;')
+            cursor.execute(f'CREATE DATABASE {destination_database.name} ;')
         except Exception as e:
             # Set the status and description after a fail
             restore.set_status(STATUS.FAILED.value)
