@@ -72,13 +72,16 @@ class BackupAdmin(admin.ModelAdmin):
         # Verify if the status is not 'Not Started'
         if obj.status == STATUS.PENDING.value:
             # Start the backup
-            tasks.perform_backup.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
+            result = tasks.perform_backup.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
         elif obj.status == STATUS.SCHEDULED.value:
             # Schedule the backup
-            tasks.perform_backup.apply_async(
+            result = tasks.perform_backup.apply_async(
                 args=[obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password')],
                 countdown=(obj.dt_create - datetime.now()).total_seconds()
             )
+
+        # Set the task id
+        obj.set_task(result.id)
 
 
 admin.site.register(Backup, BackupAdmin)
