@@ -1,7 +1,6 @@
-from datetime import datetime
-
 from django.contrib import admin
 from django import forms
+from django.utils import timezone
 
 from backup_manager import tasks
 from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS
@@ -77,7 +76,7 @@ class BackupAdmin(admin.ModelAdmin):
             # Schedule the backup
             result = tasks.perform_backup.apply_async(
                 args=[obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password')],
-                countdown=(obj.dt_create - datetime.now()).total_seconds()
+                countdown=(obj.dt_create - timezone.now()).total_seconds()
             )
 
         # Set the task id

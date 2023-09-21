@@ -1,10 +1,10 @@
 import os
-from datetime import datetime
 from enum import Enum
 
 from celery.result import AsyncResult
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 
@@ -123,7 +123,7 @@ class Backup(TaskModel):
         if not self.pk:  # If the object is being created
             # If the creation date is already set
             if not self.dt_create:
-                self.dt_create = datetime.now()
+                self.dt_create = timezone.now()
             else:
                 self.set_status(STATUS.MANUAL.value)  # The backup is already done
 
@@ -138,7 +138,7 @@ class Backup(TaskModel):
             self.name = f'{self.database.project.name}_{self.database.environment.name}_{date_time}'
 
         # If the creation date is in the future
-        if self.dt_create > datetime.now():
+        if self.dt_create > timezone.now():
             self.set_status(STATUS.SCHEDULED.value)  # The backup is scheduled
 
         super().save(*args, **kwargs)

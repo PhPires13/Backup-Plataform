@@ -1,9 +1,9 @@
 import os
 import subprocess
-from datetime import datetime
 
 import psycopg2
 from celery import shared_task
+from django.utils import timezone
 
 from backup_manager.models import Database, Backup, Restore, STATUS
 
@@ -24,7 +24,7 @@ def database_connect(database: Database, user: str, password: str) -> (psycopg2.
 def run_command(obj, command: list, password: str):
     # Set the status and description before running the command
     obj.set_status(STATUS.STARTED.value)
-    obj.dt_start = datetime.now()
+    obj.dt_start = timezone.now()
     obj.save()
 
     os.environ['PGPASSWORD'] = password
@@ -44,7 +44,7 @@ def run_command(obj, command: list, password: str):
         obj.set_status(STATUS.FAILED.value)
         obj.description = str(e)
 
-    obj.dt_end = datetime.now()  # Set the end date
+    obj.dt_end = timezone.now()  # Set the end date
     obj.save()
 
 
@@ -90,13 +90,13 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
         # Set the status and description after a fail
         restore.set_status(STATUS.FAILED.value)
         restore.description = str(e)
-        restore.dt_end = datetime.now()
+        restore.dt_end = timezone.now()
         restore.save()
         return
 
     if to_keep_old_data:
         try:
-            # Rename all current schemas to schema_(datetime.now())
+            # Rename all current schemas to schema_(timezone.now())
             cursor.execute(f"""
             SELECT schema_name
             FROM information_schema.schemata
@@ -114,7 +114,7 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
             # Set the status and description after a fail
             restore.set_status(STATUS.FAILED.value)
             restore.description = str(e)
-            restore.dt_end = datetime.now()
+            restore.dt_end = timezone.now()
             restore.save()
             return
     else:
@@ -132,7 +132,7 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
             # Set the status and description after a fail
             restore.set_status(STATUS.FAILED.value)
             restore.description = str(e)
-            restore.dt_end = datetime.now()
+            restore.dt_end = timezone.now()
             restore.save()
             return
 
@@ -143,7 +143,7 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
         # Set the status and description after a fail
         restore.set_status(STATUS.FAILED.value)
         restore.description = str(e)
-        restore.dt_end = datetime.now()
+        restore.dt_end = timezone.now()
         restore.save()
         return
 
