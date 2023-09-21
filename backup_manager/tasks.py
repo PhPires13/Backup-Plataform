@@ -76,11 +76,11 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
             # Rename all current schemas to schema_(datetime.now())
             with connection.cursor() as cursor:
                 cursor.execute(f"""
-                            SELECT schema_name 
-                            FROM information_schema.schemata 
-                            WHERE catalog_name = '{destination_database.name}' 
-                            AND schema_name NOT IN ('information_schema', 'pg_catalog', 'pg_toast') ;
-                        """)
+                SELECT schema_name
+                FROM information_schema.schemata
+                WHERE catalog_name = '{destination_database.name}'
+                AND schema_name NOT IN ('information_schema', 'pg_catalog', 'pg_toast') ;
+                """)
 
                 for row in cursor.fetchall():
                     schema_name = row[0]
