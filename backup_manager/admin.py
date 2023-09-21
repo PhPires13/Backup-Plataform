@@ -81,6 +81,7 @@ admin.site.register(Backup, BackupAdmin)
 class RestoreAdminForm(forms.ModelForm):
     user = forms.CharField(max_length=255, required=False, help_text='User with permission to perform restore')
     password = forms.CharField(max_length=255, widget=forms.PasswordInput, required=False, help_text='Password of user with permission to perform restore')
+    to_keep_old_data = forms.BooleanField(initial=True, required=False, help_text='Keep old data in the destination database')
 
     class Meta:
         model = Restore
@@ -117,7 +118,7 @@ class RestoreAdmin(admin.ModelAdmin):
         # Verify if the status is not 'Not Started'
         if obj.status == STATUS.PENDING.value:
             # Start the restore
-            tasks.perform_restore.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
+            tasks.perform_restore.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'), form.cleaned_data.get('to_keep_old_data'))
 
 
 admin.site.register(Restore, RestoreAdmin)

@@ -63,7 +63,7 @@ def perform_backup(backup_id: int, user: str, password: str):
 
 
 @shared_task
-def perform_restore(restore_id: int, user: str, password: str):
+def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data: bool):
     restore = Restore.objects.get(id=restore_id)  # Get the restore object
 
     origin_backup = restore.origin_backup
@@ -71,24 +71,34 @@ def perform_restore(restore_id: int, user: str, password: str):
 
     host = destination_database.host
 
-    try:
-        # Reset the destination database using Django's database management functions
+    if to_keep_old_data:
+        # Rename all current schemas to schema_(datetime.now())
         with connection.cursor() as cursor:
-            # Terminate all connections to the database
-            cursor.execute(f"""
-                SELECT pg_terminate_backend(pg_stat_activity.pid)
-                FROM pg_stat_activity
-                WHERE pg_stat_activity.datname = '{destination_database.name}' ;
-            """)
-            cursor.execute(f'DROP DATABASE IF EXISTS {destination_database.name} ;')
-            cursor.execute(f'CREATE DATABASE {destination_database.name} ;')
-    except Exception as e:
-        # Set the status and description after a fail
-        restore.set_status(STATUS.FAILED.value)
-        restore.description = str(e)
-        restore.dt_end = datetime.now()
-        restore.save()
-        return
+            cursor.execute(f"SELECT schema_name FROM information_schema.schemata WHERE catalog_name = '{destination_database.name}'")
+
+            for row in cursor.fetchall():
+                schema_name = row[0]
+                # if schema_name != 'public':  # If want to ignore public schema
+                cursor.execute(f"ALTER SCHEMA {schema_name} RENAME TO {schema_name}_{restore.dt_create.strftime('%d-%m-%Y-%H-%M')}")
+    else:
+        try:
+            # Reset the destination database using Django's database management functions
+            with connection.cursor() as cursor:
+                # Terminate all connections to the database
+                cursor.execute(f"""
+                    SELECT pg_terminate_backend(pg_stat_activity.pid)
+                    FROM pg_stat_activity
+                    WHERE pg_stat_activity.datname = '{destination_database.name}' ;
+                """)
+                cursor.execute(f'DROP DATABASE IF EXISTS {destination_database.name} ;')
+                cursor.execute(f'CREATE DATABASE {destination_database.name} ;')
+        except Exception as e:
+            # Set the status and description after a fail
+            restore.set_status(STATUS.FAILED.value)
+            restore.description = str(e)
+            restore.dt_end = datetime.now()
+            restore.save()
+            return
 
     # Construct the pg_restore command
     command = [
