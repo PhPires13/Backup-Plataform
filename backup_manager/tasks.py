@@ -72,14 +72,22 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
     host = destination_database.host
 
     if to_keep_old_data:
-        # Rename all current schemas to schema_(datetime.now())
-        with connection.cursor() as cursor:
-            cursor.execute(f"SELECT schema_name FROM information_schema.schemata WHERE catalog_name = '{destination_database.name}'")
+        try:
+            # Rename all current schemas to schema_(datetime.now())
+            with connection.cursor() as cursor:
+                cursor.execute(f"SELECT schema_name FROM information_schema.schemata WHERE catalog_name = '{destination_database.name}'")
 
-            for row in cursor.fetchall():
-                schema_name = row[0]
-                # if schema_name != 'public':  # If want to ignore public schema
-                cursor.execute(f"ALTER SCHEMA {schema_name} RENAME TO {schema_name}_{restore.dt_create.strftime('%d-%m-%Y-%H-%M')}")
+                for row in cursor.fetchall():
+                    schema_name = row[0]
+                    # if schema_name != 'public':  # If want to ignore public schema
+                    cursor.execute(f"ALTER SCHEMA {schema_name} RENAME TO {schema_name}_{restore.dt_create.strftime('%d-%m-%Y-%H-%M')}")
+        except Exception as e:
+            # Set the status and description after a fail
+            restore.set_status(STATUS.FAILED.value)
+            restore.description = str(e)
+            restore.dt_end = datetime.now()
+            restore.save()
+            return
     else:
         try:
             # Reset the destination database using Django's database management functions
