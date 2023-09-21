@@ -81,6 +81,7 @@ class BackupAdmin(admin.ModelAdmin):
 
         # Set the task id
         obj.set_task(result.id)
+        obj.save()
 
 
 admin.site.register(Backup, BackupAdmin)
