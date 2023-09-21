@@ -128,12 +128,17 @@ class Backup(TaskModel):
 
 
 class Restore(TaskModel):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "{origin_backup.name} -> {destination_database.name}"')
     origin_backup = models.ForeignKey(Backup, on_delete=models.CASCADE)
     destination_database = models.ForeignKey(Database, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_create}] {{{self.status}}}'
+
+    def save(self, *args, **kwargs):
+        # If the name is blank, set default
+        if not self.name:
+            self.name = f'{self.origin_backup.name} -> {self.destination_database.name}'
 
     def clean(self, *args, **kwargs):
         super().clean()
