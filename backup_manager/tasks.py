@@ -47,10 +47,10 @@ def run_command(obj, command: list, password: str):
 def perform_backup(backup_id: int, user: str, password: str):
     backup = Backup.objects.get(id=backup_id)  # Get the backup object
 
-    backup.start_task()
+    successfully_started = backup.start_task()
 
-    # Verify if the backup is not already done
-    if backup.status != STATUS.PENDING.value:
+    # Verify if it was successfully started
+    if not successfully_started:
         return
 
     host = backup.database.host
@@ -78,7 +78,11 @@ def perform_backup(backup_id: int, user: str, password: str):
 def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data: bool, to_ignore_public_schema: bool):
     restore = Restore.objects.get(id=restore_id)  # Get the restore object
 
-    restore.start_task()
+    successfully_started = restore.start_task()
+
+    # Verify if it was successfully started
+    if not successfully_started:
+        return
 
     origin_backup = restore.origin_backup
     destination_database = restore.destination_database
