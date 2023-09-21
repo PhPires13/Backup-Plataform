@@ -4,22 +4,21 @@ from datetime import datetime
 
 import psycopg2
 from celery import shared_task
-from django.db import connection
 
 from backup_manager.models import Database, Backup, Restore, STATUS
 
 
-def database_connect(database: Database, user: str, password: str) -> psycopg2.extensions.cursor:
-    conn = psycopg2.connect(
+def database_connect(database: Database, user: str, password: str) -> (psycopg2.extensions.connection, psycopg2.extensions.cursor):
+    connection = psycopg2.connect(
         host=database.host.ip,
         port=database.host.port,
         dbname=database.name,
         user=user,
         password=password,
     )
-    cursor = conn.cursor()
+    cursor = connection.cursor()
 
-    return cursor
+    return connection, cursor
 
 
 def run_command(obj, command: list, password: str):
@@ -86,7 +85,7 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
     host = destination_database.host
 
     try:
-        cursor = connection.cursor()
+        connection, cursor = database_connect(destination_database, user, password)
     except Exception as e:
         # Set the status and description after a fail
         restore.set_status(STATUS.FAILED.value)
@@ -135,6 +134,17 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
             restore.dt_end = datetime.now()
             restore.save()
             return
+
+    try:
+        connection.commit()
+        cursor.close()
+    except Exception as e:
+        # Set the status and description after a fail
+        restore.set_status(STATUS.FAILED.value)
+        restore.description = str(e)
+        restore.dt_end = datetime.now()
+        restore.save()
+        return
 
     # Construct the pg_restore command
     command = [
