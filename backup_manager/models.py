@@ -98,7 +98,7 @@ class TaskModel(models.Model):
             if result.state != 'STARTED':
                 result.revoke(terminate=True)
             else:
-                raise ValidationError(f'The task is already running')
+                raise ValidationError(f'The task is already running, wait for it to finish or force revoke it')
 
     class Meta:
         abstract = True
