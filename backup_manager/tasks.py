@@ -8,20 +8,6 @@ from django.utils import timezone
 from backup_manager.models import Database, Backup, Restore, STATUS
 
 
-def start_task(obj):
-    # Set the status and description before running the command
-    obj.set_status(STATUS.STARTED.value)
-    obj.dt_start = timezone.now()
-    obj.save()
-
-
-def finish_task(obj, status: STATUS, description: str):
-    # Set the status and description after a success
-    obj.set_status(status.value)
-    obj.dt_end = timezone.now()
-    obj.save()
-
-
 def database_connect(database: Database, user: str, password: str) -> (psycopg2.extensions.connection, psycopg2.extensions.cursor):
     connection = psycopg2.connect(
         host=database.host.ip,
@@ -61,7 +47,7 @@ def run_command(obj, command: list, password: str):
 def perform_backup(backup_id: int, user: str, password: str):
     backup = Backup.objects.get(id=backup_id)  # Get the backup object
 
-    start_task(backup)
+    backup.start_task()
 
     # Verify if the backup is not already done
     if backup.status != STATUS.PENDING.value:
@@ -85,14 +71,14 @@ def perform_backup(backup_id: int, user: str, password: str):
 
     status, description = run_command(backup, command, password)
 
-    finish_task(backup, status, description)
+    backup.finish_task(status, description)
 
 
 @shared_task
 def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data: bool, to_ignore_public_schema: bool):
     restore = Restore.objects.get(id=restore_id)  # Get the restore object
 
-    start_task(restore)
+    restore.start_task()
 
     origin_backup = restore.origin_backup
     destination_database = restore.destination_database
@@ -103,7 +89,7 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
         connection, cursor = database_connect(destination_database, user, password)
     except Exception as e:
         # Set the status and description after a fail
-        finish_task(restore, STATUS.FAILED, str(e))
+        restore.finish_task(STATUS.FAILED, str(e))
         return
 
     if to_keep_old_data:
@@ -124,7 +110,7 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
                 cursor.execute(f"ALTER SCHEMA {schema_name} RENAME TO {schema_name}_old_{restore.dt_create.strftime('%d_%m_%Y_%H_%M')} ;")
         except Exception as e:
             # Set the status and description after a fail
-            finish_task(restore, STATUS.FAILED, str(e))
+            restore.finish_task(STATUS.FAILED, str(e))
             return
     else:
         try:
@@ -139,7 +125,7 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
             cursor.execute(f'CREATE DATABASE {destination_database.name} ;')
         except Exception as e:
             # Set the status and description after a fail
-            finish_task(restore, STATUS.FAILED, str(e))
+            restore.finish_task(STATUS.FAILED, str(e))
             return
 
     try:
@@ -147,10 +133,7 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
         cursor.close()
     except Exception as e:
         # Set the status and description after a fail
-        restore.set_status(STATUS.FAILED.value)
-        restore.description = str(e)
-        restore.dt_end = timezone.now()
-        restore.save()
+        restore.finish_task(STATUS.FAILED, str(e))
         return
 
     # Construct the pg_restore command
@@ -165,4 +148,4 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
 
     status, description = run_command(restore, command, password)
 
-    finish_task(restore, status, description)
+    restore.finish_task(status, description)

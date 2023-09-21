@@ -91,6 +91,19 @@ class TaskModel(models.Model):
     def set_task(self, task_id: str = ''):
         self.task_id = task_id
 
+    def start_task(self):
+        # Set the status and description before running the command
+        self.set_status(STATUS.STARTED.value)
+        self.dt_start = timezone.now()
+        self.save()
+
+    def finish_task(self, status: STATUS, description: str):
+        # Set the status and description after a success
+        self.set_status(status.value)
+        self.dt_end = timezone.now()
+        self.description = description
+        self.save()
+
     def clean(self):
         # If it already has a task_id, revoke the task
         if self.task_id:
