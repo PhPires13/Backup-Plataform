@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 from enum import Enum
 
+from celery.result import AsyncResult
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -74,6 +75,7 @@ STATUS_CHOICES = (
 
 
 class TaskModel(models.Model):
+    task_id = models.CharField(max_length=255, null=True, blank=True)
     dt_create = models.DateTimeField(auto_now_add=True)
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
@@ -85,6 +87,18 @@ class TaskModel(models.Model):
             raise ValueError(f'Invalid status: {choice}')
 
         self.status = choice
+
+    def set_task(self, task_id: str = ''):
+        self.task_id = task_id
+
+    def clean(self):
+        # If it already has a task_id, revoke the task
+        if self.task_id:
+            result = AsyncResult(self.task_id)
+            if result.state != 'STARTED':
+                result.revoke(terminate=True)
+            else:
+                raise ValidationError(f'The task is already running')
 
     class Meta:
         abstract = True
