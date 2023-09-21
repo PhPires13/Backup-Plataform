@@ -128,7 +128,17 @@ class RestoreAdmin(admin.ModelAdmin):
         # Verify if the status is not 'Not Started'
         if obj.status == STATUS.PENDING.value:
             # Start the restore
-            tasks.perform_restore.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'), form.cleaned_data.get('to_keep_old_data'), form.cleaned_data.get('to_ignore_public_schema'))
+            result = tasks.perform_restore.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'), form.cleaned_data.get('to_keep_old_data'), form.cleaned_data.get('to_ignore_public_schema'))
+        elif obj.status == STATUS.SCHEDULED.value:
+            # Schedule the restore
+            result = tasks.perform_restore.apply_async(
+                args=[obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'), form.cleaned_data.get('to_keep_old_data'), form.cleaned_data.get('to_ignore_public_schema')],
+                countdown=(obj.dt_create - timezone.now()).total_seconds()
+            )
+
+        # Set the task id
+        obj.set_task(result.id)
+        obj.save()
 
 
 admin.site.register(Restore, RestoreAdmin)
