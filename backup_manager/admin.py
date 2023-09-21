@@ -77,7 +77,7 @@ class BackupAdmin(admin.ModelAdmin):
             # Schedule the backup
             tasks.perform_backup.apply_async(
                 args=[obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password')],
-                countdown=(obj.dt_scheduled - datetime.now()).total_seconds()
+                countdown=(obj.dt_create - datetime.now()).total_seconds()
             )
 
 

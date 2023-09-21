@@ -75,7 +75,6 @@ STATUS_CHOICES = (
 
 class TaskModel(models.Model):
     dt_create = models.DateTimeField(auto_now_add=True)
-    dt_scheduled = models.DateTimeField(null=True, blank=True)
     dt_start = models.DateTimeField(null=True, blank=True)
     dt_end = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=STATUS.PENDING.value)
@@ -124,8 +123,9 @@ class Backup(TaskModel):
         if not self.name:
             self.name = f'{self.database.project.name}_{self.database.environment.name}_{date_time}'
 
-        if self.dt_scheduled:
-            self.set_status(STATUS.SCHEDULED.value)
+        # If the creation date is in the future
+        if self.dt_create > datetime.now():
+            self.set_status(STATUS.SCHEDULED.value)  # The backup is scheduled
 
         super().save(*args, **kwargs)
 
