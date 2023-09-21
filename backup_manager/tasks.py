@@ -9,7 +9,7 @@ from django.db import connection
 from backup_manager.models import Database, Backup, Restore, STATUS
 
 
-def database_connect(database: Database, user: str, password: str):
+def database_connect(database: Database, user: str, password: str) -> psycopg2.extensions.cursor:
     conn = psycopg2.connect(
         host=database.host.ip,
         port=database.host.port,
@@ -17,8 +17,9 @@ def database_connect(database: Database, user: str, password: str):
         user=user,
         password=password,
     )
+    cursor = conn.cursor()
 
-    return conn
+    return cursor
 
 
 def run_command(obj, command: list, password: str):
