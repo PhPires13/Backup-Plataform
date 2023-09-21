@@ -142,5 +142,9 @@ class Restore(TaskModel):
         if self.origin_backup.database.project != self.destination_database.project:
             raise ValidationError(f'Origin and destination databases must be of the same project')
 
+        # Check if the origin backup is successful
+        if self.origin_backup.status != STATUS.SUCCESS.value:
+            raise ValidationError(f'Origin backup must be successful before using it to restore')
+
     class Meta:
         db_table = 'tb_restore'
