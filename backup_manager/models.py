@@ -108,7 +108,7 @@ class Backup(TaskModel):
 
     def save(self, *args, **kwargs):
         if not self.pk:  # If the object is being created
-            # If the creation date has an already been set
+            # If the creation date is already set
             if not self.dt_create:
                 self.dt_create = datetime.now()
             else:
