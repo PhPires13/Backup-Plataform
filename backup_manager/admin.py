@@ -81,7 +81,7 @@ admin.site.register(Backup, BackupAdmin)
 class RestoreAdminForm(forms.ModelForm):
     user = forms.CharField(max_length=255, required=False, help_text='User with permission to perform restore')
     password = forms.CharField(max_length=255, widget=forms.PasswordInput, required=False, help_text='Password of user with permission to perform restore')
-    to_keep_old_data = forms.BooleanField(initial=True, required=False, help_text='Keep old data in the destination database')
+    to_keep_old_data = forms.BooleanField(initial=True, required=False, help_text='Keep old data in the destination database (rename current schemas to {schema_old_DD_MM_YYYY_HH_MM})')
 
     class Meta:
         model = Restore
