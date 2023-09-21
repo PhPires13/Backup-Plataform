@@ -82,6 +82,7 @@ class RestoreAdminForm(forms.ModelForm):
     user = forms.CharField(max_length=255, required=False, help_text='User with permission to perform restore')
     password = forms.CharField(max_length=255, widget=forms.PasswordInput, required=False, help_text='Password of user with permission to perform restore')
     to_keep_old_data = forms.BooleanField(initial=True, required=False, help_text='Keep old data in the destination database (rename current schemas to {schema_old_DD_MM_YYYY_HH_MM})')
+    to_ignore_public_schema = forms.BooleanField(initial=True, required=False, help_text='Ignore public schema in the destination database')
 
     class Meta:
         model = Restore
@@ -118,7 +119,7 @@ class RestoreAdmin(admin.ModelAdmin):
         # Verify if the status is not 'Not Started'
         if obj.status == STATUS.PENDING.value:
             # Start the restore
-            tasks.perform_restore.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'), form.cleaned_data.get('to_keep_old_data'))
+            tasks.perform_restore.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'), form.cleaned_data.get('to_keep_old_data'), form.cleaned_data.get('to_ignore_public_schema'))
 
 
 admin.site.register(Restore, RestoreAdmin)

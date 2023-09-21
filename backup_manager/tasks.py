@@ -76,7 +76,7 @@ def perform_backup(backup_id: int, user: str, password: str):
 
 
 @shared_task
-def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data: bool):
+def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data: bool, to_ignore_public_schema: bool):
     restore = Restore.objects.get(id=restore_id)  # Get the restore object
 
     origin_backup = restore.origin_backup
@@ -107,7 +107,8 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
 
             for row in cursor.fetchall():
                 schema_name = row[0]
-                # if schema_name != 'public':  # If want to ignore public schema
+                if to_ignore_public_schema and schema_name == 'public':  # If want to ignore public schema
+                    continue
                 cursor.execute(f"ALTER SCHEMA {schema_name} RENAME TO {schema_name}_old_{restore.dt_create.strftime('%d_%m_%Y_%H_%M')} ;")
         except Exception as e:
             # Set the status and description after a fail
