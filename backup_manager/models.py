@@ -60,6 +60,7 @@ class STATUS(Enum):
     SUCCESS = 'SC'
     FAILED = 'FL'
     MANUAL = 'MN'
+    SCHEDULED = 'SD'
 
 
 STATUS_CHOICES = (
@@ -68,6 +69,7 @@ STATUS_CHOICES = (
     (STATUS.SUCCESS.value, STATUS.SUCCESS.name),
     (STATUS.FAILED.value, STATUS.FAILED.name),
     (STATUS.MANUAL.value, STATUS.MANUAL.name),
+    (STATUS.SCHEDULED.value, STATUS.SCHEDULED.name),
 )
 
 
