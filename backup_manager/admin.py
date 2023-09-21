@@ -59,11 +59,11 @@ class BackupAdmin(admin.ModelAdmin):
     form = BackupAdminForm
 
     def add_view(self, request, form_url='', extra_context=None):
-        self.exclude = ('task_id', 'path', 'dt_start', 'dt_end', 'status', 'description')
+        self.exclude = ('path', 'dt_start', 'dt_end', 'status', 'description')
         return super(BackupAdmin, self).add_view(request, form_url, extra_context)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
-        self.exclude = ('task_id', 'path')
+        self.exclude = ('path',)
         return super(BackupAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
@@ -116,11 +116,11 @@ class RestoreAdmin(admin.ModelAdmin):
     form = RestoreAdminForm
 
     def add_view(self, request, form_url='', extra_context=None):
-        self.exclude = ('task_id', 'dt_start', 'dt_end', 'status', 'description')
+        self.exclude = ('dt_start', 'dt_end', 'status', 'description')
         return super(RestoreAdmin, self).add_view(request, form_url, extra_context)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
-        self.exclude = ('task_id',)
+        self.exclude = ()
         return super(RestoreAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
