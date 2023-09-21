@@ -140,6 +140,8 @@ class Restore(TaskModel):
         if not self.name:
             self.name = f'{self.origin_backup.name} -> {self.destination_database.name}'
 
+        super().save(*args, **kwargs)
+
     def clean(self, *args, **kwargs):
         super().clean()
 
