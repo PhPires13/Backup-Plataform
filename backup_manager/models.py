@@ -127,15 +127,13 @@ class Backup(TaskModel):
             else:
                 self.set_status(STATUS.MANUAL.value)  # The backup is already done
 
-            date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
-
-            self.path = f'{self.database.project.name}_{self.database.name}_{date_time}.sql'  # Set the path
-
         date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
 
         # If the name is blank, set default
         if not self.name:
             self.name = f'{self.database.project.name}_{self.database.environment.name}_{date_time}'
+
+        self.path = f'{self.database.project.name}_{self.database.name}_{date_time}.sql'  # Set the path
 
         # If the creation date is in the future
         if self.dt_create > timezone.now():
