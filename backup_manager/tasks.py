@@ -13,7 +13,7 @@ def database_connect(database: Database, user: str, password: str) -> psycopg2.e
     conn = psycopg2.connect(
         host=database.host.ip,
         port=database.host.port,
-        db_name=database.name,
+        dbname=database.name,
         user=user,
         password=password,
     )
