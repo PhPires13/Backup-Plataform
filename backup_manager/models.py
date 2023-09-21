@@ -94,7 +94,7 @@ class Backup(TaskModel):
     name = models.CharField(max_length=255, blank=True, help_text='Default: "{project.name}_{environment.name}_{date_time}"')
     path = models.CharField(max_length=255)
     database = models.ForeignKey(Database, on_delete=models.CASCADE)
-    dt_create = models.DateTimeField(blank=True, help_text='Leave it _blank_ if the backup is to be done now')
+    dt_create = models.DateTimeField(blank=True, help_text='Leave it _blank_ if the backup is to be done now  | Set it to a future date if the backup is to be scheduled  | Set it to a past date if the backup is already done')
 
     def __str__(self):
         return f'{self.name} ({self.database}) [{self.dt_create}] {{{self.status}}}'
