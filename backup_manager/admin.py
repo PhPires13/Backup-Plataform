@@ -147,7 +147,10 @@ admin.site.register(Restore, RestoreAdmin)
 
 
 class PeriodicBackupAdminForm(forms.ModelForm):
-    crontab = forms.ModelForm(CrontabSchedule)
+    crontab = forms.ModelChoiceField(
+        queryset=CrontabSchedule.objects.all(),
+        required=False,
+    )
 
     class Meta:
         model = PeriodicBackup
