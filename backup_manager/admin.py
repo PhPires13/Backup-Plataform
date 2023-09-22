@@ -144,4 +144,10 @@ class RestoreAdmin(admin.ModelAdmin):
 admin.site.register(Restore, RestoreAdmin)
 
 
-admin.register(PeriodicBackup)
+class PeriodicBackupAdmin(admin.ModelAdmin):
+    list_display = ('*',)
+    search_fields = ('*',)
+    autocomplete_fields = ('database',)
+
+
+admin.site.register(PeriodicBackup, PeriodicBackupAdmin)
