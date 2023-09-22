@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'backup_manager',
     'corsheaders',  # CORS
+    'django_celery_beat',  # Periodic tasks
 ]
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'  # For custom colors in Django Admin
