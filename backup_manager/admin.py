@@ -3,7 +3,7 @@ from django import forms
 from django.utils import timezone
 
 from backup_manager import tasks
-from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS
+from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS, PeriodicTaskModel
 
 
 # Register your models here.
@@ -143,3 +143,10 @@ class RestoreAdmin(admin.ModelAdmin):
 
 admin.site.register(Restore, RestoreAdmin)
 
+
+class PeriodicTaskAdmin(admin.ModelAdmin):
+    list_display = ('name', 'task', 'enabled', 'last_run_at', 'total_run_count', 'crontab', 'interval', 'solar', 'one_off')
+    search_fields = ('name', 'task', 'enabled', 'last_run_at', 'total_run_count', 'crontab', 'interval', 'solar', 'one_off')
+
+
+admin.site.register(PeriodicTaskModel, PeriodicTaskAdmin)
