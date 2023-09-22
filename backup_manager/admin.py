@@ -145,8 +145,8 @@ admin.site.register(Restore, RestoreAdmin)
 
 
 class PeriodicTaskAdmin(admin.ModelAdmin):
-    list_display = ('name', 'task', 'enabled', 'last_run_at', 'total_run_count', 'crontab', 'interval', 'solar', 'one_off')
-    search_fields = ('name', 'task', 'enabled', 'last_run_at', 'total_run_count', 'crontab', 'interval', 'solar', 'one_off')
+    list_display = ('name', 'interval', 'task', 'enabled')
+    search_fields = ('name', 'interval', 'task', 'enabled')
 
 
 admin.site.register(PeriodicTaskModel, PeriodicTaskAdmin)
