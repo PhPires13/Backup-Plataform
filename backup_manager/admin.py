@@ -179,6 +179,7 @@ class PeriodicBackupAdmin(admin.ModelAdmin):
             name=obj.name,
             crontab=form.cleaned_data.get('crontab'),
             task='backup_manager.tasks.create_backup',
+            args=f'[{obj.database.id}]',
         )
         obj.periodic_task = periodic_task
         obj.save()
