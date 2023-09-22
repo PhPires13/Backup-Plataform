@@ -2,6 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.utils import timezone
 from django_celery_beat.admin import PeriodicTaskAdmin
+from django_celery_beat.models import PeriodicTask
 
 from backup_manager import tasks
 from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS, PeriodicBackup
@@ -143,6 +144,18 @@ class RestoreAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Restore, RestoreAdmin)
+
+
+class PeriodicBackupAdminFrom(forms.ModelForm):
+    contrab = forms.ModelChoiceField(
+        queryset=PeriodicTask.objects.all(),
+        required=True,
+        widget=forms.Select,
+    )
+
+    class Meta:
+        model = PeriodicBackup
+        fields = '__all__'
 
 
 class PeriodicBackupAdmin(admin.ModelAdmin):
