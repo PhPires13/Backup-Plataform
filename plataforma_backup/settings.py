@@ -154,3 +154,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 # Optional: Configure concurrency (number of workers and concurrency level)
 # CELERY_WORKER_CONCURRENCY = 4  # Number of worker processes
+
+# Celery Beat configuration
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
