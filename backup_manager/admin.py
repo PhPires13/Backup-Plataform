@@ -145,8 +145,9 @@ class RestoreAdmin(admin.ModelAdmin):
 admin.site.register(Restore, RestoreAdmin)
 
 
-class PeriodicBackupAdmin(PeriodicTaskAdmin):
-    autocomplete_fields = ('database',)
+class PeriodicBackupAdmin(admin.ModelAdmin):
+    list_display = ('name', 'periodic_task', 'database')
+    autocomplete_fields = ('periodic_task', 'database')
 
 
 admin.site.register(PeriodicBackup, PeriodicBackupAdmin)
