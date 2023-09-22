@@ -2,6 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.utils import timezone
 from django_celery_beat.admin import PeriodicTaskAdmin
+from django_celery_beat.models import CrontabSchedule
 
 from backup_manager import tasks
 from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS, PeriodicBackup
@@ -145,9 +146,19 @@ class RestoreAdmin(admin.ModelAdmin):
 admin.site.register(Restore, RestoreAdmin)
 
 
+class PeriodicBackupAdminForm(forms.ModelForm):
+    crontab = forms.ModelForm(CrontabSchedule)
+
+    class Meta:
+        model = PeriodicBackup
+        fields = '__all__'
+
+
 class PeriodicBackupAdmin(admin.ModelAdmin):
     list_display = ('name', 'periodic_task', 'database')
     autocomplete_fields = ('periodic_task', 'database')
+
+    form = PeriodicBackupAdminForm
 
 
 admin.site.register(PeriodicBackup, PeriodicBackupAdmin)
