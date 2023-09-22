@@ -212,7 +212,15 @@ class PeriodicTaskModel(models.Model):
 
 
 class PeriodicBackup(PeriodicTaskModel):
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {database.project.name} - {database.environment.name} ({database.name})"')
     database = models.ForeignKey(Database, on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        # If the name is blank, set default
+        if not self.name:
+            self.name = f'Backup {self.database.project.name} - {self.database.environment.name} ({self.database.name})'
+
+        super().save(*args, **kwargs)
 
     def clean(self):
         user = self.database.user if self.database.user else self.database.host.user
