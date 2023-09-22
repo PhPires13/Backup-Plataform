@@ -204,6 +204,7 @@ class Restore(TaskModel):
 
 
 class PeriodicTaskModel(models.Model):
+    name = models.CharField(max_length=255)
     periodic_task = models.OneToOneField(to=PeriodicTask, on_delete=models.CASCADE)
 
     class Meta:
