@@ -5,6 +5,7 @@ from celery.result import AsyncResult
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django_celery_beat.models import PeriodicTask
 from django_cryptography.fields import encrypt
 
 
@@ -200,3 +201,16 @@ class Restore(TaskModel):
 
     class Meta:
         db_table = 'tb_restore'
+
+
+class PeriodicBackup(PeriodicTask):
+    database = models.ForeignKey(Database, on_delete=models.CASCADE)
+
+    def clean(self):
+        user = self.user if self.user else self.host.user
+        password = self.password if self.password else self.host.password
+
+        if not user:
+            raise ValidationError(f'User not set in database or host')
+        if not password:
+            raise ValidationError(f'Password not set in database or host')
