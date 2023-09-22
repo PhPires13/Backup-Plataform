@@ -5,6 +5,8 @@ from celery.result import AsyncResult
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django_cryptography.fields import encrypt
+
 
 # Create your models here.
 
@@ -33,6 +35,8 @@ class Host(models.Model):
     name = models.CharField(max_length=255)
     ip = models.CharField(max_length=255)
     port = models.IntegerField()
+    user = models.CharField(max_length=255, null=True, blank=True, help_text='User used in periodic tasks')
+    password = encrypt(models.CharField(max_length=255, null=True, blank=True, help_text='Password of user used in periodic tasks'))
 
     def __str__(self):
         return f'{self.name} ({self.ip}:{self.port})'
@@ -46,6 +50,8 @@ class Database(models.Model):
     host = models.ForeignKey(Host, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
+    user = models.CharField(max_length=255, null=True, blank=True, help_text='Overwrite the user used in periodic tasks')
+    password = encrypt(models.CharField(max_length=255, null=True, blank=True, help_text='Overwrite the password of user used in periodic tasks'))
 
     def __str__(self):
         return f'{self.name} ({self.project.name} - {self.environment.name})'
