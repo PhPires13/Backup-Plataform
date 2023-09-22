@@ -145,8 +145,6 @@ admin.site.register(Restore, RestoreAdmin)
 
 
 class PeriodicBackupAdmin(admin.ModelAdmin):
-    list_display = ('*',)
-    search_fields = ('*',)
     autocomplete_fields = ('database',)
 
 
