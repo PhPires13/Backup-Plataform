@@ -210,7 +210,7 @@ class PeriodicTaskModel(models.Model):
         abstract = True
 
 
-class PeriodicBackup(PeriodicTask):
+class PeriodicBackup(PeriodicTaskModel):
     database = models.OneToOneField(Database, on_delete=models.CASCADE)
 
     def clean(self):
