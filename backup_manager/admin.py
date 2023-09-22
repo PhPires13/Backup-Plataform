@@ -163,5 +163,13 @@ class PeriodicBackupAdmin(admin.ModelAdmin):
 
     form = PeriodicBackupAdminForm
 
+    def add_view(self, request, form_url="", extra_context=None):
+        self.exclude = ('periodic_task',)
+        return super(PeriodicBackupAdmin, self).add_view(request, form_url, extra_context)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        self.exclude = ()
+        return super(PeriodicBackupAdmin, self).change_view(request, object_id, form_url, extra_context)
+
 
 admin.site.register(PeriodicBackup, PeriodicBackupAdmin)
