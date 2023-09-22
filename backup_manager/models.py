@@ -204,7 +204,7 @@ class Restore(TaskModel):
 
 
 class PeriodicBackup(PeriodicTask):
-    database = models.ForeignKey(Database, on_delete=models.CASCADE)
+    database = models.OneToOneField(Database, on_delete=models.CASCADE)
 
     def clean(self):
         user = self.user if self.user else self.host.user
