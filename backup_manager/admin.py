@@ -149,7 +149,5 @@ class PeriodicBackupAdmin(admin.ModelAdmin):
     list_display = ('name', 'periodic_task', 'database')
     autocomplete_fields = ('periodic_task', 'database')
 
-    form = PeriodicBackupAdminFrom
-
 
 admin.site.register(PeriodicBackup, PeriodicBackupAdmin)
