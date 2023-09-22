@@ -2,7 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.utils import timezone
 from django_celery_beat.admin import PeriodicTaskAdmin
-from django_celery_beat.models import CrontabSchedule
+from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 from backup_manager import tasks
 from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS, PeriodicBackup
@@ -170,6 +170,18 @@ class PeriodicBackupAdmin(admin.ModelAdmin):
     def change_view(self, request, object_id, form_url="", extra_context=None):
         self.exclude = ()
         return super(PeriodicBackupAdmin, self).change_view(request, object_id, form_url, extra_context)
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        # Create PeriodicTask
+        periodic_task = PeriodicTask.objects.create(
+            name=obj.name,
+            crontab=form.cleaned_data.get('crontab'),
+            task='backup_manager.tasks.create_backup',
+        )
+        obj.periodic_task = periodic_task
+        obj.save()
 
 
 admin.site.register(PeriodicBackup, PeriodicBackupAdmin)
