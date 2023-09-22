@@ -207,8 +207,8 @@ class PeriodicBackup(PeriodicTask):
     database = models.OneToOneField(Database, on_delete=models.CASCADE)
 
     def clean(self):
-        user = self.user if self.user else self.host.user
-        password = self.password if self.password else self.host.password
+        user = self.database.user if self.database.user else self.database.host.user
+        password = self.database.password if self.database.password else self.database.host.password
 
         if not user:
             raise ValidationError(f'User not set in database or host')
