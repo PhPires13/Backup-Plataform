@@ -221,3 +221,6 @@ class PeriodicBackup(PeriodicTaskModel):
             raise ValidationError(f'User not set in database or host')
         if not password:
             raise ValidationError(f'Password not set in database or host')
+
+    class Meta:
+        db_table = 'tb_periodic_backup'
