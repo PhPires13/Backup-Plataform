@@ -5,8 +5,6 @@ from celery.result import AsyncResult
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
-from django_celery_beat.models import IntervalSchedule, PeriodicTask
-
 
 # Create your models here.
 
@@ -196,14 +194,3 @@ class Restore(TaskModel):
 
     class Meta:
         db_table = 'tb_restore'
-
-
-class PeriodicTaskModel(models.Model):
-    name = models.CharField(max_length=255)
-    interval = models.ForeignKey(IntervalSchedule, on_delete=models.CASCADE)
-    task = models.ForeignKey(PeriodicTask, on_delete=models.CASCADE)
-    enabled = models.BooleanField(default=True)
-
-    def __str__(self):
-        return f'{self.name} - {self.task} [{self.interval}] {{{self.enabled}}}'
-
