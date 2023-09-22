@@ -203,6 +203,13 @@ class Restore(TaskModel):
         db_table = 'tb_restore'
 
 
+class PeriodicTaskModel(models.Model):
+    periodic_task = models.OneToOneField(to=PeriodicTask, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
 class PeriodicBackup(PeriodicTask):
     database = models.OneToOneField(Database, on_delete=models.CASCADE)
 
