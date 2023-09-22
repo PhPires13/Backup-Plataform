@@ -44,14 +44,15 @@ def run_command(obj, command: list, password: str):
 
 
 @shared_task
-def perform_backup(backup_id: int, user: str, password: str):
+def perform_backup(backup_id: int, user: str, password: str, already_started: bool = False):
     backup = Backup.objects.get(id=backup_id)  # Get the backup object
 
-    successfully_started = backup.start_task()
+    if already_started:  # Verify if the task was already started
+        successfully_started = backup.start_task()
 
-    # Verify if it was successfully started
-    if not successfully_started:
-        return
+        # Verify if it was successfully started
+        if not successfully_started:
+            return
 
     host = backup.database.host
     database = backup.database
@@ -153,3 +154,29 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
     status, description = run_command(restore, command, password)
 
     restore.finish_task(status, description)
+
+
+@shared_task
+def create_backup(database_id: int):
+    database = Database.objects.get(id=database_id)
+
+    # Create the backup object
+    backup = Backup.objects.create(
+        database=database
+    )
+
+    backup.start_task()
+
+    # Get the user and password from the database
+    user = database.user if database.user else database.host.user
+    password = database.password if database.password else database.host.password
+
+    if not user:
+        backup.finish_task(STATUS.FAILED, 'User not set in database or host')
+        return
+    if not password:
+        backup.finish_task(STATUS.FAILED, 'Password not set in database or host')
+        return
+
+    # Start the backup
+    perform_backup.delay(backup.id, user, password, already_started=True)
