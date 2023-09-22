@@ -47,7 +47,7 @@ def run_command(obj, command: list, password: str):
 def perform_backup(backup_id: int, user: str, password: str, already_started: bool = False):
     backup = Backup.objects.get(id=backup_id)  # Get the backup object
 
-    if already_started:  # Verify if the task was already started
+    if not already_started:  # Verify if the task was already started
         successfully_started = backup.start_task()
 
         # Verify if it was successfully started
