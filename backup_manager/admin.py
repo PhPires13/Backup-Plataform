@@ -3,7 +3,7 @@ from django import forms
 from django.utils import timezone
 
 from backup_manager import tasks
-from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS
+from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS, PeriodicBackup
 
 
 # Register your models here.
@@ -142,3 +142,6 @@ class RestoreAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Restore, RestoreAdmin)
+
+
+admin.register(PeriodicBackup)
