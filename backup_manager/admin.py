@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django import forms
 from django.utils import timezone
+from django_celery_beat.admin import PeriodicTaskAdmin
 
 from backup_manager import tasks
 from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS, PeriodicBackup
@@ -144,7 +145,7 @@ class RestoreAdmin(admin.ModelAdmin):
 admin.site.register(Restore, RestoreAdmin)
 
 
-class PeriodicBackupAdmin(admin.ModelAdmin):
+class PeriodicBackupAdmin(PeriodicTaskAdmin):
     autocomplete_fields = ('database',)
 
 
