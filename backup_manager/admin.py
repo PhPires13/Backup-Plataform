@@ -173,13 +173,10 @@ class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
         return super(PeriodicDatabaseBackupAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-
         if obj.periodic_task:
             # Update PeriodicTask
             obj.periodic_task.name = obj.name
             obj.periodic_task.crontab = form.cleaned_data.get('crontab')
-            obj.periodic_task.save()
         else:
             # Create PeriodicTask
             periodic_task = PeriodicTask.objects.create(
@@ -189,7 +186,8 @@ class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
                 args=f'[{obj.database.id}]',
             )
             obj.periodic_task = periodic_task
-            obj.save()
+
+        super().save_model(request, obj, form, change)
 
 
 admin.site.register(PeriodicDatabaseBackup, PeriodicDatabaseBackupAdmin)
@@ -210,13 +208,10 @@ class PeriodicEnvironmentBackupAdmin(admin.ModelAdmin):
         return super(PeriodicEnvironmentBackupAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
-
         if obj.periodic_task:
             # Update PeriodicTask
             obj.periodic_task.name = obj.name
             obj.periodic_task.crontab = form.cleaned_data.get('crontab')
-            obj.periodic_task.save()
         else:
             # Create PeriodicTask
             periodic_task = PeriodicTask.objects.create(
@@ -226,7 +221,8 @@ class PeriodicEnvironmentBackupAdmin(admin.ModelAdmin):
                 args=f'[{obj.environment.id}]',
             )
             obj.periodic_task = periodic_task
-            obj.save()
+
+        super().save_model(request, obj, form, change)
 
 
 admin.site.register(PeriodicEnvironmentBackup, PeriodicEnvironmentBackupAdmin)
