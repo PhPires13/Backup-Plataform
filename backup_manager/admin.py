@@ -158,7 +158,7 @@ class PeriodicTaskAdminForm(forms.ModelForm):
         fields = '__all__'
 
 
-class PeriodicBackupAdmin(admin.ModelAdmin):
+class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
     list_display = ('name', 'periodic_task', 'database')
     autocomplete_fields = ('periodic_task', 'database')
 
@@ -166,11 +166,11 @@ class PeriodicBackupAdmin(admin.ModelAdmin):
 
     def add_view(self, request, form_url="", extra_context=None):
         self.exclude = ('periodic_task',)
-        return super(PeriodicBackupAdmin, self).add_view(request, form_url, extra_context)
+        return super(PeriodicDatabaseBackupAdmin, self).add_view(request, form_url, extra_context)
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         self.exclude = ()
-        return super(PeriodicBackupAdmin, self).change_view(request, object_id, form_url, extra_context)
+        return super(PeriodicDatabaseBackupAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
@@ -192,7 +192,7 @@ class PeriodicBackupAdmin(admin.ModelAdmin):
             obj.save()
 
 
-admin.site.register(PeriodicDatabaseBackup, PeriodicBackupAdmin)
+admin.site.register(PeriodicDatabaseBackup, PeriodicDatabaseBackupAdmin)
 
 
 class PeriodicEnvironmentBackupAdmin(admin.ModelAdmin):
