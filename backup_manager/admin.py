@@ -179,13 +179,12 @@ class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
             obj.periodic_task.crontab = form.cleaned_data.get('crontab')
         else:
             # Create PeriodicTask
-            periodic_task = PeriodicTask.objects.create(
+            obj.periodic_task = PeriodicTask.objects.create(
                 name=obj.name,
                 crontab=form.cleaned_data.get('crontab'),
                 task='backup_manager.tasks.create_backup',
                 args=f'[{obj.database.id}]',
             )
-            obj.periodic_task = periodic_task
 
         super().save_model(request, obj, form, change)
 
@@ -214,13 +213,12 @@ class PeriodicEnvironmentBackupAdmin(admin.ModelAdmin):
             obj.periodic_task.crontab = form.cleaned_data.get('crontab')
         else:
             # Create PeriodicTask
-            periodic_task = PeriodicTask.objects.create(
+            obj.periodic_task = PeriodicTask.objects.create(
                 name=obj.name,
                 crontab=form.cleaned_data.get('crontab'),
                 task='backup_manager.tasks.backup_environment',
                 args=f'[{obj.environment.id}]',
             )
-            obj.periodic_task = periodic_task
 
         super().save_model(request, obj, form, change)
 
