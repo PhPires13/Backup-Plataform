@@ -223,13 +223,13 @@ class PeriodicTaskModel(models.Model):
 
 
 class PeriodicDatabaseBackup(PeriodicTaskModel):
-    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {database.project.name} - {database.environment.name} ({database.name})"')
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {database.project.name} - {database.environment.name} ({database.name}) [{self.periodic_task.crontab}]"')
     database = models.ForeignKey(Database, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         # If the name is blank, set default
         if not self.name:
-            self.name = f'Backup {self.database.project.name} - {self.database.environment.name} ({self.database.name})'
+            self.name = f'Backup {self.database.project.name} - {self.database.environment.name} ({self.database.name}) [{self.periodic_task.crontab}]'
 
         self.periodic_task.task = 'backup_manager.tasks.create_backup'
         self.periodic_task.args = f'[{self.database.id}]'
@@ -250,13 +250,13 @@ class PeriodicDatabaseBackup(PeriodicTaskModel):
 
 
 class PeriodicEnvironmentBackup(PeriodicTaskModel):
-    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {environment.name}"')
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {environment.name} [{self.periodic_task.crontab}]"')
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         # If the name is blank, set default
         if not self.name:
-            self.name = f'Backup {self.environment.name}'
+            self.name = f'Backup {self.environment.name} [{self.periodic_task.crontab}]'
 
         self.periodic_task.task = 'backup_manager.tasks.backup_environment'
         self.periodic_task.args = f'[{self.environment.id}]'
