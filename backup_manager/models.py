@@ -159,7 +159,7 @@ class Backup(TaskModel):
         path = os.path.join(default, self.database.environment.name, month_year, self.database.project.name, self.path)
         return path
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.pk:  # If the object is being created
             # If the creation date is already set
             if not self.dt_create:
@@ -179,7 +179,7 @@ class Backup(TaskModel):
         if self.dt_create > timezone.now():
             self.set_status(STATUS.SCHEDULED.value)  # The backup is scheduled
 
-        super().save(*args, **kwargs)
+        super().save(force_insert, force_update, using, update_fields)
 
     class Meta:
         db_table = 'tb_backup'
@@ -193,12 +193,12 @@ class Restore(TaskModel):
     def __str__(self):
         return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_create}] {{{self.status}}}'
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # If the name is blank, set default
         if not self.name:
             self.name = f'{self.origin_backup} -> {self.destination_database}'
 
-        super().save(*args, **kwargs)
+        super().save(force_insert, force_update, using, update_fields)
 
     def clean(self, *args, **kwargs):
         super().clean()
@@ -238,7 +238,7 @@ class PeriodicDatabaseBackup(PeriodicTaskModel):
     name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {database.project.name} - {database.environment.name} ({database.name}) [{self.periodic_task.crontab}]"')
     database = models.ForeignKey(Database, on_delete=models.CASCADE)
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # If the name is blank, set default
         if not self.name:
             self.name = f'Backup {self.database.project.name} - {self.database.environment.name} ({self.database.name}) [{self.periodic_task.crontab}]'
@@ -246,7 +246,7 @@ class PeriodicDatabaseBackup(PeriodicTaskModel):
         self.periodic_task.task = 'backup_manager.tasks.create_backup'
         self.periodic_task.args = f'[{self.database.id}]'
 
-        super().save(*args, **kwargs)
+        super().save(force_insert, force_update, using, update_fields)
 
     def clean(self):
         user = self.database.user if self.database.user else self.database.host.user
@@ -265,7 +265,7 @@ class PeriodicEnvironmentBackup(PeriodicTaskModel):
     name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {environment.name} [{self.periodic_task.crontab}]"')
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # If the name is blank, set default
         if not self.name:
             self.name = f'Backup {self.environment.name} [{self.periodic_task.crontab}]'
@@ -273,7 +273,7 @@ class PeriodicEnvironmentBackup(PeriodicTaskModel):
         self.periodic_task.task = 'backup_manager.tasks.backup_environment'
         self.periodic_task.args = f'[{self.environment.id}]'
 
-        super().save(*args, **kwargs)
+        super().save(force_insert, force_update, using, update_fields)
 
     class Meta:
         db_table = 'tb_periodic_environment_backup'
