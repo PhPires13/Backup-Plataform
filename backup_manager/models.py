@@ -37,7 +37,7 @@ class Host(models.Model):
     ip = models.CharField(max_length=255)
     port = models.IntegerField()
     user = models.CharField(max_length=255, null=True, blank=True, help_text='User used in periodic tasks')
-    password = encrypt(models.CharField(max_length=255, null=True, blank=True, help_text='Password of user used in periodic tasks'))
+    password = encrypt(models.CharField(max_length=255, null=True, blank=True, help_text='Password of user used in periodic tasks (encrypted)'))
 
     def __str__(self):
         return f'{self.name} ({self.ip}:{self.port})'
@@ -52,7 +52,7 @@ class Database(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
     user = models.CharField(max_length=255, null=True, blank=True, help_text='Overwrite the user used in periodic tasks')
-    password = encrypt(models.CharField(max_length=255, null=True, blank=True, help_text='Overwrite the password of user used in periodic tasks'))
+    password = encrypt(models.CharField(max_length=255, null=True, blank=True, help_text='Overwrite the password of user used in periodic tasks (encrypted)'))
 
     def __str__(self):
         return f'{self.name} ({self.project.name} - {self.environment.name})'
