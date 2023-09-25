@@ -236,5 +236,9 @@ class PeriodicBackup(PeriodicTaskModel):
         if not password:
             raise ValidationError(f'Password not set in database or host')
 
+        # Verify if there is already a PeriodicBackup for this database with the same crontab
+        if PeriodicBackup.objects.filter(database=self.database, periodic_task__crontab=self.periodic_task.crontab).exclude(id=self.id).exists():
+            raise ValidationError(f'There is already a PeriodicBackup for this database with the same crontab')
+
     class Meta:
         db_table = 'tb_periodic_backup'
