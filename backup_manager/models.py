@@ -133,8 +133,9 @@ class TaskModel(models.Model):
         if self.task_id:
             try:
                 result = AsyncResult(self.task_id)
-                if result.state != 'STARTED':
-                    result.revoke(terminate=True, wait=True, timeout=15)
+                if result.state == 'STARTED':
+                    raise ValidationError(f'The task is already running, wait for it to finish!')
+                result.revoke(terminate=True, wait=True, timeout=15)
             except Exception as e:
                 raise ValidationError(f'Error revoking task: {e}')
 
