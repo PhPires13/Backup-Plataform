@@ -207,6 +207,11 @@ class PeriodicTaskModel(models.Model):
     name = models.CharField(max_length=255)
     periodic_task = models.OneToOneField(to=PeriodicTask, on_delete=models.CASCADE, null=True, blank=True)
 
+    def delete(self, using=None, keep_parents=False):
+        if self.periodic_task:
+            self.periodic_task.delete()
+        super().delete(using, keep_parents)
+
     class Meta:
         abstract = True
 
