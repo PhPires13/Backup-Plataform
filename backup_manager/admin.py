@@ -149,7 +149,7 @@ admin.site.register(Restore, RestoreAdmin)
 class PeriodicTaskAdminForm(forms.ModelForm):
     crontab = forms.ModelChoiceField(
         queryset=CrontabSchedule.objects.all(),
-        required=True,
+        required=False,
     )
 
     class Meta:
