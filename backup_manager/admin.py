@@ -5,7 +5,7 @@ from django_celery_beat.admin import PeriodicTaskAdmin
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 from backup_manager import tasks
-from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS, PeriodicBackup
+from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS, PeriodicDatabaseBackup
 
 
 # Register your models here.
@@ -153,7 +153,7 @@ class PeriodicTaskAdminForm(forms.ModelForm):
     )
 
     class Meta:
-        model = PeriodicBackup
+        model = PeriodicDatabaseBackup
         fields = '__all__'
 
 
@@ -191,4 +191,4 @@ class PeriodicBackupAdmin(admin.ModelAdmin):
             obj.save()
 
 
-admin.site.register(PeriodicBackup, PeriodicBackupAdmin)
+admin.site.register(PeriodicDatabaseBackup, PeriodicBackupAdmin)

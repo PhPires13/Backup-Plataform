@@ -216,7 +216,7 @@ class PeriodicTaskModel(models.Model):
         abstract = True
 
 
-class PeriodicBackup(PeriodicTaskModel):
+class PeriodicDatabaseBackup(PeriodicTaskModel):
     name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {database.project.name} - {database.environment.name} ({database.name})"')
     database = models.ForeignKey(Database, on_delete=models.CASCADE)
 
@@ -237,4 +237,4 @@ class PeriodicBackup(PeriodicTaskModel):
             raise ValidationError(f'Password not set in database or host')
 
     class Meta:
-        db_table = 'tb_periodic_backup'
+        db_table = 'tb_periodic_database_backup'
