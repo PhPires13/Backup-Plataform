@@ -207,6 +207,12 @@ class PeriodicTaskModel(models.Model):
     name = models.CharField(max_length=255)
     periodic_task = models.OneToOneField(to=PeriodicTask, on_delete=models.CASCADE, null=True, blank=True)
 
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.periodic_task.name = self.name
+        self.periodic_task.save()
+
+        super().save(force_insert, force_update, using, update_fields)
+
     def delete(self, using=None, keep_parents=False):
         if self.periodic_task:
             self.periodic_task.delete()
@@ -224,6 +230,9 @@ class PeriodicDatabaseBackup(PeriodicTaskModel):
         # If the name is blank, set default
         if not self.name:
             self.name = f'Backup {self.database.project.name} - {self.database.environment.name} ({self.database.name})'
+
+        self.periodic_task.task = 'backup_manager.tasks.create_backup'
+        self.periodic_task.args = f'[{self.database.id}]'
 
         super().save(*args, **kwargs)
 
@@ -248,6 +257,11 @@ class PeriodicEnvironmentBackup(PeriodicTaskModel):
         # If the name is blank, set default
         if not self.name:
             self.name = f'Backup {self.environment.name}'
+
+        self.periodic_task.task = 'backup_manager.tasks.backup_environment'
+        self.periodic_task.args = f'[{self.environment.id}]'
+
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'tb_periodic_environment_backup'
