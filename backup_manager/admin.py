@@ -146,7 +146,7 @@ class RestoreAdmin(admin.ModelAdmin):
 admin.site.register(Restore, RestoreAdmin)
 
 
-class PeriodicBackupAdminForm(forms.ModelForm):
+class PeriodicTaskAdminForm(forms.ModelForm):
     crontab = forms.ModelChoiceField(
         queryset=CrontabSchedule.objects.all(),
         required=False,
@@ -161,7 +161,7 @@ class PeriodicBackupAdmin(admin.ModelAdmin):
     list_display = ('name', 'periodic_task', 'database')
     autocomplete_fields = ('periodic_task', 'database')
 
-    form = PeriodicBackupAdminForm
+    form = PeriodicTaskAdminForm
 
     def add_view(self, request, form_url="", extra_context=None):
         self.exclude = ('periodic_task',)
