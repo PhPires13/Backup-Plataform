@@ -5,7 +5,8 @@ from django_celery_beat.admin import PeriodicTaskAdmin
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 from backup_manager import tasks
-from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS, PeriodicDatabaseBackup
+from backup_manager.models import Environment, Project, Backup, Restore, Database, Host, STATUS, PeriodicDatabaseBackup, \
+    PeriodicEnvironmentBackup
 
 
 # Register your models here.
@@ -192,3 +193,40 @@ class PeriodicBackupAdmin(admin.ModelAdmin):
 
 
 admin.site.register(PeriodicDatabaseBackup, PeriodicBackupAdmin)
+
+
+class PeriodicEnvironmentBackupAdmin(admin.ModelAdmin):
+    list_display = ('name', 'periodic_task', 'environment')
+    autocomplete_fields = ('periodic_task', 'environment')
+
+    form = PeriodicTaskAdminForm
+
+    def add_view(self, request, form_url="", extra_context=None):
+        self.exclude = ('periodic_task',)
+        return super(PeriodicEnvironmentBackupAdmin, self).add_view(request, form_url, extra_context)
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        self.exclude = ()
+        return super(PeriodicEnvironmentBackupAdmin, self).change_view(request, object_id, form_url, extra_context)
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+
+        if obj.periodic_task:
+            # Update PeriodicTask
+            obj.periodic_task.name = obj.name
+            obj.periodic_task.crontab = form.cleaned_data.get('crontab')
+            obj.periodic_task.save()
+        else:
+            # Create PeriodicTask
+            periodic_task = PeriodicTask.objects.create(
+                name=obj.name,
+                crontab=form.cleaned_data.get('crontab'),
+                task='backup_manager.tasks.backup_environment',
+                args=f'[{obj.environment.id}]',
+            )
+            obj.periodic_task = periodic_task
+            obj.save()
+
+
+admin.site.register(PeriodicEnvironmentBackup, PeriodicEnvironmentBackupAdmin)

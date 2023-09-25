@@ -5,7 +5,7 @@ import psycopg2
 from celery import shared_task
 from django.utils import timezone
 
-from backup_manager.models import Database, Backup, Restore, STATUS
+from backup_manager.models import Database, Backup, Restore, STATUS, Environment
 
 
 def database_connect(database: Database, user: str, password: str) -> (psycopg2.extensions.connection, psycopg2.extensions.cursor):
@@ -180,3 +180,15 @@ def create_backup(database_id: int):
 
     # Start the backup
     perform_backup.delay(backup.id, user, password, already_started=True)
+
+
+@shared_task
+def backup_environment(environment_id: int):
+    environment = Environment.objects.get(id=environment_id)
+
+    # Get all databases from the environment
+    databases = Database.objects.filter(environment=environment)
+
+    # Create a backup for each database
+    for database in databases:
+        create_backup.delay(database.id)

@@ -238,3 +238,16 @@ class PeriodicDatabaseBackup(PeriodicTaskModel):
 
     class Meta:
         db_table = 'tb_periodic_database_backup'
+
+
+class PeriodicEnvironmentBackup(PeriodicTaskModel):
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {environment.name}"')
+    environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
+
+    def save(self, *args, **kwargs):
+        # If the name is blank, set default
+        if not self.name:
+            self.name = f'Backup {self.environment.name}'
+
+    class Meta:
+        db_table = 'tb_periodic_environment_backup'
