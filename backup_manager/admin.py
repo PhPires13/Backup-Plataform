@@ -174,15 +174,21 @@ class PeriodicBackupAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
 
-        # Create PeriodicTask
-        periodic_task = PeriodicTask.objects.create(
-            name=obj.name,
-            crontab=form.cleaned_data.get('crontab'),
-            task='backup_manager.tasks.create_backup',
-            args=f'[{obj.database.id}]',
-        )
-        obj.periodic_task = periodic_task
-        obj.save()
+        if obj.periodic_task:
+            # Update PeriodicTask
+            obj.periodic_task.name = obj.name
+            obj.periodic_task.crontab = form.cleaned_data.get('crontab')
+            obj.periodic_task.save()
+        else:
+            # Create PeriodicTask
+            periodic_task = PeriodicTask.objects.create(
+                name=obj.name,
+                crontab=form.cleaned_data.get('crontab'),
+                task='backup_manager.tasks.create_backup',
+                args=f'[{obj.database.id}]',
+            )
+            obj.periodic_task = periodic_task
+            obj.save()
 
 
 admin.site.register(PeriodicBackup, PeriodicBackupAdmin)
