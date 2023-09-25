@@ -128,6 +128,18 @@ class TaskModel(models.Model):
             else:
                 raise ValidationError(f'The task is already running, wait for it to finish!')
 
+    def delete(self, using=None, keep_parents=False):
+        # If it already has a task_id, revoke the task
+        if self.task_id:
+            try:
+                result = AsyncResult(self.task_id)
+                if result.state != 'STARTED':
+                    result.revoke(terminate=True, wait=True, timeout=15)
+            except Exception as e:
+                raise ValidationError(f'Error revoking task: {e}')
+
+        super().delete(using, keep_parents)
+
     class Meta:
         abstract = True
 
