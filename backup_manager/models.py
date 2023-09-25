@@ -4,6 +4,7 @@ from enum import Enum
 from celery.result import AsyncResult
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import ProtectedError
 from django.utils import timezone
 from django_celery_beat.models import PeriodicTask
 from django_cryptography.fields import encrypt
@@ -134,10 +135,10 @@ class TaskModel(models.Model):
             try:
                 result = AsyncResult(self.task_id)
                 if result.state == 'STARTED':
-                    raise ValidationError(f'The task is already running, wait for it to finish!')
+                    raise ProtectedError(f'The task is already running, wait for it to finish!')
                 result.revoke(terminate=True, wait=True, timeout=15)
             except Exception as e:
-                raise ValidationError(f'Error revoking task: {e}')
+                raise ProtectedError(f'Error revoking task: {e}')
 
         super().delete(using, keep_parents)
 
