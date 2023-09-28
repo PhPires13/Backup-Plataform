@@ -164,7 +164,7 @@ class PeriodicTaskAdminForm(forms.ModelForm):
 
 
 class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
-    def get_periodic_task_enabled(self, obj):
+    def get_periodic_task_enabled(self, obj) -> bool:
         return obj.periodic_task.enabled if obj.periodic_task else None
 
     list_display = ('name', 'get_periodic_task_enabled', 'periodic_task', 'database')
@@ -194,7 +194,7 @@ admin.site.register(PeriodicDatabaseBackup, PeriodicDatabaseBackupAdmin)
 
 
 class PeriodicEnvironmentBackupAdmin(admin.ModelAdmin):
-    def get_periodic_task_enabled(self, obj):
+    def get_periodic_task_enabled(self, obj) -> bool:
         return obj.periodic_task.enabled if obj.periodic_task else None
 
     list_display = ('name', 'get_periodic_task_enabled', 'periodic_task', 'environment')
