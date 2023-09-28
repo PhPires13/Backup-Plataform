@@ -150,12 +150,16 @@ admin.site.register(Restore, RestoreAdmin)
 class PeriodicTaskAdminForm(forms.ModelForm):
     crontab = forms.ModelChoiceField(
         queryset=CrontabSchedule.objects.all(),
-        required=False,
+        required=True,
     )
 
     class Meta:
         model = PeriodicDatabaseBackup
         fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['crontab'].initial = self.instance.periodic_task.crontab  # Set the initial value as the current
 
 
 class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
