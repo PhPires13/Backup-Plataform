@@ -164,7 +164,10 @@ class PeriodicTaskAdminForm(forms.ModelForm):
 
 
 class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'periodic_task__enabled()', 'periodic_task', 'database')
+    def get_periodic_task_enabled(self, obj):
+        return obj.periodic_task.enabled if obj.periodic_task else None
+
+    list_display = ('name', 'get_periodic_task_enabled', 'periodic_task', 'database')
     autocomplete_fields = ('periodic_task', 'database')
 
     form = PeriodicTaskAdminForm
@@ -191,7 +194,10 @@ admin.site.register(PeriodicDatabaseBackup, PeriodicDatabaseBackupAdmin)
 
 
 class PeriodicEnvironmentBackupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'periodic_task__enabled()', 'periodic_task', 'environment')
+    def get_periodic_task_enabled(self, obj):
+        return obj.periodic_task.enabled if obj.periodic_task else None
+
+    list_display = ('name', 'get_periodic_task_enabled', 'periodic_task', 'environment')
     autocomplete_fields = ('periodic_task', 'environment')
 
     form = PeriodicTaskAdminForm
