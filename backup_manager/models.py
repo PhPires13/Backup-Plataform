@@ -118,6 +118,8 @@ class TaskModel(models.Model):
         self.save()
 
     def clean(self):
+        super().clean()
+
         # If it already has a task_id, revoke the task
         if self.task_id:
             try:
@@ -251,6 +253,8 @@ class PeriodicDatabaseBackup(PeriodicTaskModel):
         super().save(force_insert, force_update, using, update_fields)
 
     def clean(self):
+        super().clean()
+
         user = self.database.user if self.database.user else self.database.host.user
         password = self.database.password if self.database.password else self.database.host.password
 
