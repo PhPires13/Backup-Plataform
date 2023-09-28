@@ -173,11 +173,11 @@ class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
     form = PeriodicTaskAdminForm
 
     def add_view(self, request, form_url="", extra_context=None):
-        self.exclude = ('periodic_task',)
+        self.exclude = ('name', 'periodic_task')
         return super(PeriodicDatabaseBackupAdmin, self).add_view(request, form_url, extra_context)
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
-        self.exclude = ()
+        self.exclude = ('name',)
         return super(PeriodicDatabaseBackupAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
@@ -203,11 +203,11 @@ class PeriodicEnvironmentBackupAdmin(admin.ModelAdmin):
     form = PeriodicTaskAdminForm
 
     def add_view(self, request, form_url="", extra_context=None):
-        self.exclude = ('periodic_task',)
+        self.exclude = ('name', 'periodic_task')
         return super(PeriodicEnvironmentBackupAdmin, self).add_view(request, form_url, extra_context)
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
-        self.exclude = ()
+        self.exclude = ('name',)
         return super(PeriodicEnvironmentBackupAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
