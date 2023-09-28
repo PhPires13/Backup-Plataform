@@ -249,7 +249,6 @@ class PeriodicTaskModel(models.Model):
     def delete(self, using=None, keep_parents=False):
         if self.periodic_task:
             self.periodic_task.delete()
-        super().delete(using, keep_parents)
 
     class Meta:
         abstract = True
