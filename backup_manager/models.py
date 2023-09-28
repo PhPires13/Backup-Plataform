@@ -239,7 +239,7 @@ class PeriodicTaskModel(models.Model):
 
 
 class PeriodicDatabaseBackup(PeriodicTaskModel):
-    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {database.project.name} - {database.environment.name} ({database.name}) [{self.periodic_task.crontab}]"')
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {database.project.name} - {database.environment.name} ({database.name}) [{self.periodic_task.crontab.human_readable}]"')
     database = models.ForeignKey(Database, on_delete=models.CASCADE)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
@@ -268,7 +268,7 @@ class PeriodicDatabaseBackup(PeriodicTaskModel):
 
 
 class PeriodicEnvironmentBackup(PeriodicTaskModel):
-    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {environment.name} [{self.periodic_task.crontab}]"')
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {environment.name} [{self.periodic_task.crontab.human_readable}]"')
     environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
