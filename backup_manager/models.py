@@ -229,6 +229,12 @@ class PeriodicTaskModel(models.Model):
 
         super().save(force_insert, force_update, using, update_fields)
 
+    def clean(self):
+        super().clean()
+
+        if not self.periodic_task.crontab:
+            raise ValidationError(f'Crontab not set in periodic task')
+
     def delete(self, using=None, keep_parents=False):
         if self.periodic_task:
             self.periodic_task.delete()
