@@ -39,6 +39,7 @@ admin.site.register(Host, HostAdmin)
 class DatabaseAdmin(admin.ModelAdmin):
     list_display = ('name', 'host', 'project', 'environment')
     search_fields = ('name', 'host__name', 'project__name', 'environment__name')
+    list_filter = ('host', 'project', 'environment')
     autocomplete_fields = ('host', 'project', 'environment')
 
 
