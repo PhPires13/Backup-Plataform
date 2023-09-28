@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django import forms
 from django.utils import timezone
-from django_celery_beat.admin import PeriodicTaskAdmin
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 from backup_manager import tasks
@@ -166,22 +165,19 @@ class PeriodicTaskAdminForm(forms.ModelForm):
             self.fields['crontab'].initial = self.instance.periodic_task.crontab  # Set the initial value as the current
 
 
-class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
+class PeriodicTaskAdmin(admin.ModelAdmin):
     def enabled(self, obj) -> bool:
         return obj.periodic_task.enabled if obj.periodic_task else None
-
-    list_display = ('name', 'enabled', 'periodic_task', 'database')
-    autocomplete_fields = ('periodic_task', 'database')
 
     form = PeriodicTaskAdminForm
 
     def add_view(self, request, form_url="", extra_context=None):
         self.exclude = ('name', 'periodic_task')
-        return super(PeriodicDatabaseBackupAdmin, self).add_view(request, form_url, extra_context)
+        return super(PeriodicTaskAdmin, self).add_view(request, form_url, extra_context)
 
     def change_view(self, request, object_id, form_url="", extra_context=None):
         self.exclude = ('name',)
-        return super(PeriodicDatabaseBackupAdmin, self).change_view(request, object_id, form_url, extra_context)
+        return super(PeriodicTaskAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):
         if not obj.periodic_task:
@@ -195,40 +191,19 @@ class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
     def delete_model(self, request, obj):
         obj.periodic_task.delete()
         super().delete_model(request, obj)
+
+
+class PeriodicDatabaseBackupAdmin(PeriodicTaskAdmin):
+    list_display = ('name', 'enabled', 'periodic_task', 'database')
+    autocomplete_fields = ('periodic_task', 'database')
 
 
 admin.site.register(PeriodicDatabaseBackup, PeriodicDatabaseBackupAdmin)
 
 
-class PeriodicEnvironmentBackupAdmin(admin.ModelAdmin):
-    def enabled(self, obj) -> bool:
-        return obj.periodic_task.enabled if obj.periodic_task else None
-
+class PeriodicEnvironmentBackupAdmin(PeriodicTaskAdmin):
     list_display = ('name', 'enabled', 'periodic_task', 'environment')
     autocomplete_fields = ('periodic_task', 'environment')
-
-    form = PeriodicTaskAdminForm
-
-    def add_view(self, request, form_url="", extra_context=None):
-        self.exclude = ('name', 'periodic_task')
-        return super(PeriodicEnvironmentBackupAdmin, self).add_view(request, form_url, extra_context)
-
-    def change_view(self, request, object_id, form_url="", extra_context=None):
-        self.exclude = ('name',)
-        return super(PeriodicEnvironmentBackupAdmin, self).change_view(request, object_id, form_url, extra_context)
-
-    def save_model(self, request, obj, form, change):
-        if not obj.periodic_task:
-            # Create PeriodicTask
-            obj.periodic_task = PeriodicTask(
-                crontab=form.cleaned_data.get('crontab'),
-            )
-
-        super().save_model(request, obj, form, change)
-
-    def delete_model(self, request, obj):
-        obj.periodic_task.delete()
-        super().delete_model(request, obj)
 
 
 admin.site.register(PeriodicEnvironmentBackup, PeriodicEnvironmentBackupAdmin)
