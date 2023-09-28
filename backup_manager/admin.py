@@ -159,7 +159,8 @@ class PeriodicTaskAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['crontab'].initial = self.instance.periodic_task.crontab  # Set the initial value as the current
+        if self.instance.periodic_task:
+            self.fields['crontab'].initial = self.instance.periodic_task.crontab  # Set the initial value as the current
 
 
 class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
