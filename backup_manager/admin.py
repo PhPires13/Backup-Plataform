@@ -192,6 +192,10 @@ class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
 
         super().save_model(request, obj, form, change)
 
+    def delete_model(self, request, obj):
+        obj.periodic_task.delete()
+        super().delete_model(request, obj)
+
 
 admin.site.register(PeriodicDatabaseBackup, PeriodicDatabaseBackupAdmin)
 
@@ -221,6 +225,10 @@ class PeriodicEnvironmentBackupAdmin(admin.ModelAdmin):
             )
 
         super().save_model(request, obj, form, change)
+
+    def delete_model(self, request, obj):
+        obj.periodic_task.delete()
+        super().delete_model(request, obj)
 
 
 admin.site.register(PeriodicEnvironmentBackup, PeriodicEnvironmentBackupAdmin)
