@@ -189,12 +189,14 @@ class PeriodicTaskAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
     def delete_model(self, request, obj):
-        obj.periodic_task.delete()
+        if obj.periodic_task:
+            obj.periodic_task.delete()
         super().delete_model(request, obj)
 
     def delete_queryset(self, request, queryset):
         for obj in queryset:
-            obj.periodic_task.delete()
+            if obj.periodic_task:
+                obj.periodic_task.delete()
         super().delete_queryset(request, queryset)
 
 
