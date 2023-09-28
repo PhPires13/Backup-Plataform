@@ -167,7 +167,7 @@ class PeriodicDatabaseBackupAdmin(admin.ModelAdmin):
     def enabled(self, obj) -> bool:
         return obj.periodic_task.enabled if obj.periodic_task else None
 
-    list_display = ('name', 'get_periodic_task_enabled', 'periodic_task', 'database')
+    list_display = ('name', 'enabled', 'periodic_task', 'database')
     autocomplete_fields = ('periodic_task', 'database')
 
     form = PeriodicTaskAdminForm
@@ -197,7 +197,7 @@ class PeriodicEnvironmentBackupAdmin(admin.ModelAdmin):
     def enabled(self, obj) -> bool:
         return obj.periodic_task.enabled if obj.periodic_task else None
 
-    list_display = ('name', 'get_periodic_task_enabled', 'periodic_task', 'environment')
+    list_display = ('name', 'enabled', 'periodic_task', 'environment')
     autocomplete_fields = ('periodic_task', 'environment')
 
     form = PeriodicTaskAdminForm
