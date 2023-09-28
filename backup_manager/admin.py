@@ -192,6 +192,11 @@ class PeriodicTaskAdmin(admin.ModelAdmin):
         obj.periodic_task.delete()
         super().delete_model(request, obj)
 
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            obj.periodic_task.delete()
+        super().delete_queryset(request, queryset)
+
 
 class PeriodicDatabaseBackupAdmin(PeriodicTaskAdmin):
     list_display = ('name', 'enabled', 'periodic_task', 'database')
