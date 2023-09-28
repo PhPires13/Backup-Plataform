@@ -273,7 +273,7 @@ class PeriodicEnvironmentBackup(PeriodicTaskModel):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # If the name is blank, set default
-        if not self.name:
+        if not self.name or (f'Backup {self.environment.name} [' in self.name):
             self.name = f'Backup {self.environment.name} [{self.periodic_task.crontab.human_readable}]'
 
         self.periodic_task.task = 'backup_manager.tasks.backup_environment'
