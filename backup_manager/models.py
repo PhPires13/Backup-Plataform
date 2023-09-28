@@ -245,7 +245,7 @@ class PeriodicDatabaseBackup(PeriodicTaskModel):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # If the name is blank, set default
         if not self.name:
-            self.name = f'Backup {self.database.project.name} - {self.database.environment.name} ({self.database.name}) [{self.periodic_task.crontab}]'
+            self.name = f'Backup {self.database.project.name} - {self.database.environment.name} ({self.database.name}) [{self.periodic_task.crontab.human_readable}]'
 
         self.periodic_task.task = 'backup_manager.tasks.create_backup'
         self.periodic_task.args = f'[{self.database.id}]'
@@ -274,7 +274,7 @@ class PeriodicEnvironmentBackup(PeriodicTaskModel):
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # If the name is blank, set default
         if not self.name:
-            self.name = f'Backup {self.environment.name} [{self.periodic_task.crontab}]'
+            self.name = f'Backup {self.environment.name} [{self.periodic_task.crontab.human_readable}]'
 
         self.periodic_task.task = 'backup_manager.tasks.backup_environment'
         self.periodic_task.args = f'[{self.environment.id}]'
