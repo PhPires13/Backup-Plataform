@@ -57,6 +57,7 @@ class BackupAdminForm(forms.ModelForm):
 class BackupAdmin(admin.ModelAdmin):
     list_display = ('name', 'path', 'database', 'dt_create', 'dt_start', 'dt_end', 'status', 'description')
     search_fields = ('name', 'path', 'database', 'dt_create', 'status')
+    list_filter = ('database', 'status')
     autocomplete_fields = ('database',)
 
     form = BackupAdminForm
@@ -114,6 +115,7 @@ class RestoreAdmin(admin.ModelAdmin):
 
     list_display = ('name', 'origin_backup', 'destination_database', 'dt_create', 'dt_start', 'dt_end', 'status', 'truncated_description')
     search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_database__name', 'dt_start', 'status')
+    list_filter = ('destination_database', 'status')
     autocomplete_fields = ('origin_backup', 'destination_database')
 
     form = RestoreAdminForm
