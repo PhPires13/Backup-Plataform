@@ -90,6 +90,21 @@ class TaskModel(models.Model):
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=STATUS.PENDING.value)
     description = models.TextField(null=True, blank=True)
 
+    def is_running(self) -> bool:
+        if self.status == STATUS.STARTED.value:
+            return True
+        return False
+
+    def is_finished(self) -> bool:
+        if self.status in [STATUS.SUCCESS.value, STATUS.FAILED.value, STATUS.MANUAL.value]:
+            return True
+        return False
+
+    def is_waiting(self) -> bool:
+        if self.status in [STATUS.PENDING.value, STATUS.SCHEDULED.value]:
+            return True
+        return False
+
     def set_status(self, choice: str = ''):
         if choice not in [status[0] for status in STATUS_CHOICES]:
             raise ValueError(f'Invalid status: {choice}')
@@ -121,7 +136,7 @@ class TaskModel(models.Model):
         super().clean()
 
         # If it already has a task_id, revoke the task
-        if self.task_id:
+        if self.task_id and not self.is_running():
             try:
                 result = AsyncResult(self.task_id)
                 if result.state != 'STARTED':
@@ -130,6 +145,8 @@ class TaskModel(models.Model):
                 raise ValidationError(f'Error revoking task: {e}')
             else:
                 raise ValidationError(f'The task is already running, wait for it to finish!')
+        elif self.is_running():
+            raise ValidationError(f'The task is already running, wait for it to finish!')
 
     def delete(self, using=None, keep_parents=False):
         # If it already has a task_id, revoke the task
