@@ -21,16 +21,6 @@ def database_connect(database: Database, user: str, password: str) -> (psycopg2.
     return connection, cursor
 
 
-def get_pg_version(database: Database, user: str, password: str) -> str:
-    connection, cursor = database_connect(database, user, password)
-    cursor.execute('SELECT version() ;')
-    pg_version = cursor.fetchone()[0].split(' ')[1]
-    cursor.close()
-    connection.close()
-
-    return pg_version
-
-
 def run_command(obj, command: list, password: str):
     # Set the postgres password as an environment variable
     os.environ['PGPASSWORD'] = password
@@ -70,18 +60,9 @@ def perform_backup(backup_id: int, user: str, password: str, already_started: bo
     # Create the directory structure if it doesn't exist
     os.makedirs(os.path.dirname(backup.complete_path()), exist_ok=True)
 
-    # Get the postgres version
-    try:
-        pg_version = get_pg_version(database, user, password)
-    except Exception as e:
-        # Set the status and description after a fail
-        backup.finish_task(STATUS.FAILED, str(e))
-        return
-
     # Construct the pg_dump command
     command = [
         'pg_dump',
-        '-V', pg_version,
         '-h', host.ip,
         '-p', str(host.port),
         '-U', user,
@@ -160,17 +141,9 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
         restore.finish_task(STATUS.FAILED, str(e))
         return
 
-    try:
-        pg_version = get_pg_version(destination_database, user, password)
-    except Exception as e:
-        # Set the status and description after a fail
-        restore.finish_task(STATUS.FAILED, str(e))
-        return
-
     # Construct the pg_restore command
     command = [
         'psql',
-        '-V', pg_version,
         '-h', host.ip,
         '-p', str(host.port),
         '-U', user,
