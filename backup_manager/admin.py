@@ -55,8 +55,8 @@ class BackupAdminForm(forms.ModelForm):
 
 
 class BackupAdmin(admin.ModelAdmin):
-    list_display = ('name', 'path', 'database', 'dt_create', 'dt_start', 'dt_end', 'status', 'description')
-    search_fields = ('name', 'path', 'database', 'dt_create', 'status')
+    list_display = ('name', 'path', 'database', 'dt_reference', 'dt_start', 'dt_end', 'status', 'description')
+    search_fields = ('name', 'path', 'database', 'dt_reference', 'status')
     list_filter = ('database', 'database__project', 'database__environment', 'status')
     autocomplete_fields = ('database',)
 
@@ -80,7 +80,7 @@ class BackupAdmin(admin.ModelAdmin):
             # Schedule the backup
             result = tasks.perform_backup.apply_async(
                 args=[obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password')],
-                countdown=(obj.dt_create - timezone.now()).total_seconds()
+                countdown=(obj.dt_reference - timezone.now()).total_seconds()
             )
 
         # Set the task id
@@ -113,7 +113,7 @@ class RestoreAdmin(admin.ModelAdmin):
         else:
             return obj.description
 
-    list_display = ('name', 'origin_backup', 'destination_database', 'dt_create', 'dt_start', 'dt_end', 'status', 'truncated_description')
+    list_display = ('name', 'origin_backup', 'destination_database', 'dt_reference', 'dt_start', 'dt_end', 'status', 'truncated_description')
     search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_database__name', 'dt_start', 'status')
     list_filter = ('destination_database', 'destination_database__project', 'destination_database__environment', 'status')
     autocomplete_fields = ('origin_backup', 'destination_database')
@@ -138,7 +138,7 @@ class RestoreAdmin(admin.ModelAdmin):
             # Schedule the restore
             result = tasks.perform_restore.apply_async(
                 args=[obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'), form.cleaned_data.get('to_keep_old_data'), form.cleaned_data.get('to_ignore_public_schema')],
-                countdown=(obj.dt_create - timezone.now()).total_seconds()
+                countdown=(obj.dt_reference - timezone.now()).total_seconds()
             )
 
         # Set the task id

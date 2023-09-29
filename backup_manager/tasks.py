@@ -112,7 +112,7 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
                 schema_name = row[0]
                 if to_ignore_public_schema and schema_name == 'public':  # Verify if the public schema should be ignored
                     continue
-                cursor.execute(f"ALTER SCHEMA {schema_name} RENAME TO {schema_name}_old_{restore.dt_create.strftime('%d_%m_%Y_%H_%M')} ;")
+                cursor.execute(f"ALTER SCHEMA {schema_name} RENAME TO {schema_name}_old_{restore.dt_reference.strftime('%d_%m_%Y_%H_%M')} ;")
         except Exception as e:
             # Set the status and description after a fail
             restore.finish_task(STATUS.FAILED, str(e))

@@ -84,7 +84,7 @@ STATUS_CHOICES = (
 
 class TaskModel(models.Model):
     task_id = models.CharField(max_length=255, null=True, blank=True, verbose_name='Celery Task ID')
-    dt_create = models.DateTimeField(auto_now_add=True, verbose_name='Creation Date')
+    dt_reference = models.DateTimeField(auto_now_add=True, verbose_name='Reference Date')
     dt_start = models.DateTimeField(null=True, blank=True, verbose_name='Start Date')
     dt_end = models.DateTimeField(null=True, blank=True, verbose_name='End Date')
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=STATUS.PENDING.value, verbose_name='Execution Status')
@@ -169,26 +169,26 @@ class Backup(TaskModel):
     name = models.CharField(max_length=255, blank=True, help_text='Default: "{project.name}_{environment.name}_{date_time}"', verbose_name='Name')
     path = models.CharField(max_length=255, verbose_name='Path')
     database = models.ForeignKey(Database, on_delete=models.CASCADE, verbose_name='Database')
-    dt_create = models.DateTimeField(blank=True, help_text='Leave it _blank_ if the backup is to be done now  | Set it to a future date if the backup is to be scheduled  | Set it to a past date if the backup is already done', verbose_name='Creation Date')
+    dt_reference = models.DateTimeField(blank=True, help_text='Leave it _blank_ if the backup is to be done now  | Set it to a future date if the backup is to be scheduled  | Set it to a past date if the backup is already done', verbose_name='Reference Date')
 
     def __str__(self):
-        return f'{self.name} ({self.database}) [{self.dt_create}] {{{self.status}}}'
+        return f'{self.name} ({self.database}) [{self.dt_reference}] {{{self.status}}}'
 
     def complete_path(self) -> str:
         default = os.path.join('/', 'mnt', 'netapp01', 'postgres')
-        month_year = self.dt_create.strftime('%m-%Y')
+        month_year = self.dt_reference.strftime('%m-%Y')
         path = os.path.join(default, self.database.environment.name, month_year, self.database.project.name, self.path)
         return path
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.pk:  # If the object is being created
-            # If the creation date is already set
-            if not self.dt_create:
-                self.dt_create = timezone.now()
+            # If the reference date is already set
+            if not self.dt_reference:
+                self.dt_reference = timezone.now()
             else:
                 self.set_status(STATUS.MANUAL.value)  # The backup is already done
 
-        date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
+        date_time: str = self.dt_reference.strftime('%d-%m-%Y-%H-%M')
 
         # If the name is blank, set default
         if not self.name:
@@ -196,8 +196,8 @@ class Backup(TaskModel):
 
         self.path = f'{self.database.project.name}_{self.database.name}_{date_time}.sql'  # Set the path
 
-        # If the creation date is in the future
-        if self.dt_create > timezone.now():
+        # If the reference date is in the future
+        if self.dt_reference > timezone.now():
             self.set_status(STATUS.SCHEDULED.value)  # The backup is scheduled
 
         super().save(force_insert, force_update, using, update_fields)
@@ -212,7 +212,7 @@ class Restore(TaskModel):
     destination_database = models.ForeignKey(Database, on_delete=models.CASCADE, verbose_name='Destination Database')
 
     def __str__(self):
-        return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_create}] {{{self.status}}}'
+        return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_reference}] {{{self.status}}}'
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # If the name is blank, set default
