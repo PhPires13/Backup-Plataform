@@ -38,6 +38,8 @@
 
 
 ## Installation
+- ### Environment Variables
+  - Configure the ``.env`` file
 - ### Python 3.11
     - https://www.python.org/downloads/
 - ### Install Required Modules:
