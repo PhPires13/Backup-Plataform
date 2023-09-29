@@ -1,6 +1,8 @@
 # PLATAFORMA-BACKUP
 
 ## Start Application
+- ### All the steps together
+  - Run ``sudo ./start_project.sh``
 - ### Run the Application
   - #### Locally
     - Terminal >> inside the project folder <br>
