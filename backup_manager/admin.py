@@ -45,12 +45,11 @@ class DatabaseAdmin(admin.ModelAdmin):
 admin.site.register(Database, DatabaseAdmin)
 
 
-class BackupAdminForm(forms.ModelForm):
-    user = forms.CharField(max_length=255, required=False, help_text='User with permission to perform backup')
-    password = forms.CharField(max_length=255, widget=forms.PasswordInput, required=False, help_text='Password of user with permission to perform backup')
+class TaskAdminForm(forms.ModelForm):
+    user = forms.CharField(max_length=255, required=False, help_text='User with permission to perform the action')
+    password = forms.CharField(max_length=255, widget=forms.PasswordInput, required=False, help_text='Password of user with permission to perform the action')
 
     class Meta:
-        model = Backup
         fields = '__all__'
 
 
@@ -60,7 +59,7 @@ class BackupAdmin(admin.ModelAdmin):
     list_filter = ('database', 'database__project', 'database__environment', 'status')
     autocomplete_fields = ('database',)
 
-    form = BackupAdminForm
+    form = TaskAdminForm
 
     def add_view(self, request, form_url='', extra_context=None):
         self.exclude = ('task_id', 'path', 'dt_start', 'dt_end', 'status', 'description')
@@ -91,9 +90,7 @@ class BackupAdmin(admin.ModelAdmin):
 admin.site.register(Backup, BackupAdmin)
 
 
-class RestoreAdminForm(forms.ModelForm):
-    user = forms.CharField(max_length=255, required=False, help_text='User with permission to perform restore')
-    password = forms.CharField(max_length=255, widget=forms.PasswordInput, required=False, help_text='Password of user with permission to perform restore')
+class RestoreAdminForm(TaskAdminForm):
     to_keep_old_data = forms.BooleanField(initial=True, required=False, help_text='Keep old data in the destination database (rename current schemas to {schema_old_DD_MM_YYYY_HH_MM})')
     to_ignore_public_schema = forms.BooleanField(initial=True, required=False, help_text='Ignore public schema in the destination database')
 
