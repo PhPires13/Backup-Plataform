@@ -29,7 +29,7 @@ def run_command(obj, command: list, password: str):
     try:
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=password, check=True, encoding='utf-8')
         # Set the status and description after a success
-        status= STATUS.SUCCESS
+        status = STATUS.SUCCESS
         description = result.stdout
     except subprocess.CalledProcessError as e:
         # Set the status and description after a fail
@@ -122,9 +122,9 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
             # Reset the destination database using Django's database management functions
             # Terminate all connections to the database
             cursor.execute(f"""
-                SELECT pg_terminate_backend(pg_stat_activity.pid)
-                FROM pg_stat_activity
-                WHERE pg_stat_activity.datname = '{destination_database.name}' ;
+            SELECT pg_terminate_backend(pg_stat_activity.pid)
+            FROM pg_stat_activity
+            WHERE pg_stat_activity.datname = '{destination_database.name}' ;
             """)
             cursor.execute(f'DROP DATABASE IF EXISTS {destination_database.name} ;')
             cursor.execute(f'CREATE DATABASE {destination_database.name} ;')
