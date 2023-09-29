@@ -9,6 +9,9 @@
     - Terminal >> inside the project folder <br> ``python manage.py runserver 0.0.0.0:8000``
       - ``0.0.0.0`` wil make the server available on all network interfaces
       - Hosted in your PC accessible by other devices on the same network using your IP
+  - #### Detached from the terminal
+    - `nohup <command> &` enclosing the command
+      - log file `nohup.out` will be created in the current directory
 - ### Run the Redis Server
   - #### Locally
     - Terminal >> ``sudo service redis-server start``
