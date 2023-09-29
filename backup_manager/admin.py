@@ -156,7 +156,6 @@ class PeriodicTaskAdminForm(forms.ModelForm):
     )
 
     class Meta:
-        model = PeriodicDatabaseBackup
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
