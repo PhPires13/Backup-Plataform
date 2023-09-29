@@ -38,5 +38,22 @@
   - Terminal >> inside the project folder <br> ``pip install -r requirements.txt``
 - ### Redis
   - https://redis.io/
-  - Linux:
+  - #### Linux:
     - Terminal >> ``sudo apt install redis``
+- ### PostgreSQL-Client
+  - It is important to have the lates version of the PostgreSQL-Client, in order for the commands to work with all server versions
+  - #### Linux:
+    - Enable PostgreSQL Package Repository
+      ```
+      sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+      wget -qO- https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo tee /etc/apt/trusted.gpg.d/pgdg.asc &>/dev/null
+      sudo apt update
+      ```
+    - Install PostgreSQL-Client
+      ```
+      sudo apt install postgresql-client
+      ```
+    - Check the version
+      ```
+      psql --version
+      ```
