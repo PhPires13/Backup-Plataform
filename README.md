@@ -47,6 +47,11 @@
 - ### Install Required Modules:
   - Terminal >> inside the project folder <br>
     ```pip install -r requirements.txt```
+  - Possible errors (mostly on Linux):
+    - ``Error: pg_config executable not found.`` <br>
+      Terminal >> ```sudo apt install python3-dev libpq-dev```
+    - ``error: command 'x86_64-linux-gnu-gcc' failed: No such file or directory`` <br>
+      Terminal >> ```sudo apt-get install build-essential libssl-dev libffi-dev python3-dev```
 - ### Redis
   - https://redis.io/
   - #### Linux:
