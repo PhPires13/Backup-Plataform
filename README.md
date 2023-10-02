@@ -52,6 +52,8 @@
       Terminal >> ```sudo apt install python3-dev libpq-dev```
     - ``error: command 'x86_64-linux-gnu-gcc' failed: No such file or directory`` <br>
       Terminal >> ```sudo apt-get install build-essential libssl-dev libffi-dev python3-dev```
+    - ``error: command '/usr/bin/x86_64-linux-gnu-gcc' failed with exit code 1`` <br>
+      Terminal >> ```sudo apt-get install python3.11-dev```
 - ### Redis
   - https://redis.io/
   - #### Linux:
