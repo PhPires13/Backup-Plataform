@@ -70,6 +70,8 @@ class STATUS(Enum):
     FAILED = 'FL'
     MANUAL = 'MN'
     SCHEDULED = 'SD'
+    REVOKING = 'RV'
+    CANCELED = 'CC'
 
 
 STATUS_CHOICES = (
@@ -79,6 +81,8 @@ STATUS_CHOICES = (
     (STATUS.FAILED.value, STATUS.FAILED.name),
     (STATUS.MANUAL.value, STATUS.MANUAL.name),
     (STATUS.SCHEDULED.value, STATUS.SCHEDULED.name),
+    (STATUS.REVOKING.value, STATUS.REVOKING.name),
+    (STATUS.CANCELED.value, STATUS.CANCELED.name),
 )
 
 
