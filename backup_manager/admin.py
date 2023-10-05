@@ -53,6 +53,19 @@ class TaskAdminForm(forms.ModelForm):
         fields = '__all__'
 
 
+class TaskAdmin(admin.ModelAdmin):
+    form = TaskAdminForm
+
+    def delete_model(self, request, obj):
+        if obj.task_id:
+            tasks.revoke_task.delay(obj.id, type(obj).__name__)
+
+    def delete_queryset(self, request, queryset):
+        for obj in queryset:
+            if obj.task_id:
+                tasks.revoke_task.delay(obj.id, type(obj).__name__)
+
+
 class BackupAdmin(admin.ModelAdmin):
     list_display = ('name', 'path', 'database', 'dt_reference', 'dt_start', 'dt_end', 'status', 'description')
     search_fields = ('name', 'path', 'database', 'dt_reference', 'status')
