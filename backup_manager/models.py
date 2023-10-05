@@ -153,15 +153,8 @@ class TaskModel(models.Model):
     def delete(self, using=None, keep_parents=False):
         # If it already has a task_id, revoke the task
         if self.task_id:
-            try:
-                result = AsyncResult(self.task_id)
-                if result.state == 'STARTED':
-                    raise ProtectedError(f'The task is already running, wait for it to finish!')
-                result.revoke(terminate=True, wait=True, timeout=15)
-            except Exception as e:
-                raise ProtectedError(f'Error revoking task: {e}')
-
-        super().delete(using, keep_parents)
+            from backup_manager import tasks  # Has to be here to avoid circular imports
+            tasks.revoke_task.delay(self.id, self.__class__.__name__)
 
     class Meta:
         abstract = True
