@@ -8,3 +8,6 @@ sudo pkill -f 'celery -A plataforma_backup beat --loglevel=info'
 
 # Start the Django development server
 sudo pkill -f 'python3.11 manage.py runserver 0.0.0.0:8000'
+
+# Stop the Redis server
+sudo service redis-server stop
