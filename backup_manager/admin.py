@@ -66,13 +66,11 @@ class TaskAdmin(admin.ModelAdmin):
                 tasks.revoke_task.delay(obj.id, type(obj).__name__)
 
 
-class BackupAdmin(admin.ModelAdmin):
+class BackupAdmin(TaskAdmin):
     list_display = ('name', 'path', 'database', 'dt_reference', 'dt_start', 'dt_end', 'status', 'description')
     search_fields = ('name', 'path', 'database', 'dt_reference', 'status')
     list_filter = ('database', 'database__project', 'database__environment', 'status')
     autocomplete_fields = ('database',)
-
-    form = TaskAdminForm
 
     def add_view(self, request, form_url='', extra_context=None):
         self.exclude = ('task_id', 'path', 'dt_start', 'dt_end', 'status', 'description')
@@ -116,7 +114,7 @@ class RestoreAdminForm(TaskAdminForm):
         fields = '__all__'
 
 
-class RestoreAdmin(admin.ModelAdmin):
+class RestoreAdmin(TaskAdmin):
     def truncated_description(self, obj):
         if not obj.description:  # Verify if it is empty
             return obj.description
@@ -131,8 +129,6 @@ class RestoreAdmin(admin.ModelAdmin):
     search_fields = ('name', 'origin_backup__name', 'origin_backup__project__name', 'destination_database__name', 'dt_start', 'status')
     list_filter = ('destination_database', 'destination_database__project', 'destination_database__environment', 'status')
     autocomplete_fields = ('origin_backup', 'destination_database')
-
-    form = RestoreAdminForm
 
     def add_view(self, request, form_url='', extra_context=None):
         self.exclude = ('task_id', 'dt_start', 'dt_end', 'status', 'description')
