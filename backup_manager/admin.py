@@ -75,6 +75,10 @@ class BackupAdmin(admin.ModelAdmin):
         if obj.status == STATUS.PENDING.value:
             # Start the backup
             result = tasks.perform_backup.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'))
+
+            # Set the task id
+            obj.set_task(result.id)
+            obj.save()
         elif obj.status == STATUS.SCHEDULED.value:
             # Schedule the backup
             result = tasks.perform_backup.apply_async(
@@ -82,9 +86,9 @@ class BackupAdmin(admin.ModelAdmin):
                 countdown=(obj.dt_reference - timezone.now()).total_seconds()
             )
 
-        # Set the task id
-        obj.set_task(result.id)
-        obj.save()
+            # Set the task id
+            obj.set_task(result.id)
+            obj.save()
 
 
 admin.site.register(Backup, BackupAdmin)
@@ -131,6 +135,10 @@ class RestoreAdmin(admin.ModelAdmin):
         if obj.status == STATUS.PENDING.value:
             # Start the restore
             result = tasks.perform_restore.delay(obj.id, form.cleaned_data.get('user'), form.cleaned_data.get('password'), form.cleaned_data.get('to_keep_old_data'), form.cleaned_data.get('to_ignore_public_schema'))
+
+            # Set the task id
+            obj.set_task(result.id)
+            obj.save()
         elif obj.status == STATUS.SCHEDULED.value:
             # Schedule the restore
             result = tasks.perform_restore.apply_async(
@@ -138,9 +146,9 @@ class RestoreAdmin(admin.ModelAdmin):
                 countdown=(obj.dt_reference - timezone.now()).total_seconds()
             )
 
-        # Set the task id
-        obj.set_task(result.id)
-        obj.save()
+            # Set the task id
+            obj.set_task(result.id)
+            obj.save()
 
 
 admin.site.register(Restore, RestoreAdmin)
