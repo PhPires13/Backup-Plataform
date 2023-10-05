@@ -134,22 +134,6 @@ class TaskModel(models.Model):
         self.description = description
         self.save()
 
-    def clean(self):
-        super().clean()
-
-        # If it already has a task_id, revoke the task
-        if self.task_id and not self.is_running():
-            try:
-                result = AsyncResult(self.task_id)
-                if result.state != 'STARTED':
-                    result.revoke(terminate=True, wait=True, timeout=15)
-            except Exception as e:
-                raise ValidationError(f'Error revoking task: {e}')
-            else:
-                raise ValidationError(f'The task is already running, wait for it to finish!')
-        elif self.is_running():
-            raise ValidationError(f'The task is already running, wait for it to finish!')
-
     class Meta:
         abstract = True
 
