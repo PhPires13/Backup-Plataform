@@ -212,8 +212,7 @@ def revoke_task(task_id: int, task_type: str):
     result = revoke(task.task_id, terminate=True, wait=True)
 
     if result.get('ok'):
-        task.set_task(None)
-        task.set_status(STATUS.CANCELED.value)
+        task.delete()
     else:
         task.set_status(initial_status, result.get('error'))
-    task.save()
+        task.save()
