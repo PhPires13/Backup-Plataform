@@ -3,6 +3,7 @@ import subprocess
 
 import psycopg2
 from celery import shared_task
+from celery.worker.control import revoke
 from django.utils import timezone
 
 from backup_manager.models import Database, Backup, Restore, STATUS, Environment
@@ -192,3 +193,27 @@ def backup_environment(environment_id: int):
     # Create a backup for each database
     for database in databases:
         create_backup.delay(database.id)
+
+
+@shared_task
+def revoke_task(task_id: int, task_type: str):
+    if task_type == Backup.__name__:
+        task = Backup.objects.get(id=task_id)
+    elif task_type == Restore.__name__:
+        task = Restore.objects.get(id=task_id)
+    else:
+        return
+
+    initial_status = task.status
+
+    task.set_status(STATUS.REVOKING.value)
+    task.save()
+
+    result = revoke(task.task_id, terminate=True, wait=True)
+
+    if result.get('ok'):
+        task.set_task(None)
+        task.set_status(STATUS.CANCELED.value)
+    else:
+        task.set_status(initial_status, result.get('error'))
+    task.save()
