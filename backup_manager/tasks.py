@@ -209,7 +209,12 @@ def revoke_task(task_id: int, task_type: str):
     task.set_status(STATUS.REVOKING.value)
     task.save()
 
-    result = revoke(task.task_id, terminate=True, wait=True)
+    try:
+        result = revoke(task.task_id, terminate=True, wait=True)
+    except Exception as e:
+        task.set_status(initial_status, str(e))
+        task.save()
+        return
 
     if result.get('ok'):
         task.delete()
