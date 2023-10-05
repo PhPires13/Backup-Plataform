@@ -39,6 +39,11 @@
       - log file ``nohup.out`` will be created in the current directory
 
 
+## Stop Application
+- ### All the steps together
+  - Run ``sudo ./stop_project.sh``
+
+
 ## Installation
 - ### Environment Variables
   - Configure the ``.env`` file
