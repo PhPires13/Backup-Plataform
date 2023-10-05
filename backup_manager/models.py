@@ -150,12 +150,6 @@ class TaskModel(models.Model):
         elif self.is_running():
             raise ValidationError(f'The task is already running, wait for it to finish!')
 
-    def delete(self, using=None, keep_parents=False):
-        # If it already has a task_id, revoke the task
-        if self.task_id:
-            from backup_manager import tasks  # Has to be here to avoid circular imports
-            tasks.revoke_task.delay(self.id, self.__class__.__name__)
-
     class Meta:
         abstract = True
 
