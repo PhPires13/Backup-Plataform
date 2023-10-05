@@ -210,7 +210,7 @@ def revoke_task(task_id: int, task_type: str):
     task.save()
 
     try:
-        result = revoke(task_id=task.task_id, terminate=True, wait=True)
+        result = revoke('ALL', task.task_id, terminate=True, wait=True)
     except Exception as e:
         task.set_status(initial_status)
         task.description = f'Error while revoking task: {str(e)}'
