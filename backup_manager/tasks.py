@@ -4,7 +4,6 @@ import subprocess
 import psycopg2
 from celery import shared_task
 from celery.worker.control import revoke
-from django.utils import timezone
 
 from backup_manager.models import Database, Backup, Restore, STATUS, Environment
 
