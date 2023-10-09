@@ -3,7 +3,21 @@ version: '3.3'
 services:
   web:
     build: .
+    command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
-    volumes:
-      - .:/mnt
+
+  redis:
+    image: redis:latest
+
+  celery-worker:
+    build: .
+    command: celery -A plataforma_backup worker --loglevel=info
+    depends_on:
+      - redis
+
+  celery-beat:
+    build: .
+    command: celery -A plataforma_backup beat --loglevel=info
+    depends_on:
+      - redis
