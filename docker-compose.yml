@@ -9,6 +9,7 @@ services:
 
   redis:
     image: redis:latest
+    command: service redis-server start
     ports:
       - "6379:6379"
 
