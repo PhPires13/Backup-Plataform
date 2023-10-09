@@ -4,4 +4,6 @@ start-application-job:
   before_script:
     - pip install -r requirements.txt
   script:
-    - sh start.sh
+    - docker-compose build
+    - docker-compose down
+    - docker-compose up -d
