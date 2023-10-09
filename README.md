@@ -2,7 +2,7 @@
 
 ## Start Application
 - ### All the steps together
-  - Run ``sudo ./start_project.sh``
+  - Run ``sudo ./start.sh``
 - ### Run the Application
   - #### Locally
     - Terminal >> inside the project folder <br>
@@ -41,7 +41,7 @@
 
 ## Stop Application
 - ### All the steps together
-  - Run ``sudo ./stop_project.sh``
+  - Run ``sudo ./stop.sh``
 
 
 ## Installation
