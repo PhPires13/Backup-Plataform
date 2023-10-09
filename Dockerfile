@@ -17,6 +17,3 @@ COPY . .
 
 # Expose the port your application will run on
 EXPOSE 8000
-
-# Run the command to start your application
-CMD ["sh", "start.sh"]
