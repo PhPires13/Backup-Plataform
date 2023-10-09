@@ -4,4 +4,4 @@ start-application-job:
   before_script:
     - pip install -r requirements.txt
   script:
-    - sudo sh start.sh
+    - sh start.sh
