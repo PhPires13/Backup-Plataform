@@ -9,7 +9,6 @@ services:
 
   redis:
     image: redis:latest
-    command: service redis-server --port 6379
     ports:
       - "6379:6379"
 
