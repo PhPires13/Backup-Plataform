@@ -15,5 +15,8 @@ RUN pip install -r requirements.txt
 # Copy the rest of your application's code into the container
 COPY . .
 
+# Install PostgreSQL-Client
+RUN apt-get update && apt-get install -y postgresql-client
+
 # Expose the port your application will run on
 EXPOSE 8000
