@@ -21,7 +21,7 @@ admin.site.register(Project, ProjectAdmin)
 
 class EnvironmentAdmin(admin.ModelAdmin):
     list_display = ('name',)
-    search_fields = ('name', 'host_db')
+    search_fields = ('name',)
 
 
 admin.site.register(Environment, EnvironmentAdmin)
@@ -68,7 +68,7 @@ class TaskAdmin(admin.ModelAdmin):
 
 class BackupAdmin(TaskAdmin):
     list_display = ('name', 'path', 'database', 'dt_reference', 'dt_start', 'dt_end', 'status', 'description')
-    search_fields = ('name', 'path', 'database', 'dt_reference', 'status')
+    search_fields = ('name', 'path', 'database__name', 'dt_reference', 'status')
     list_filter = ('database', 'database__project', 'database__environment', 'status')
     autocomplete_fields = ('database',)
 
