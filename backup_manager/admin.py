@@ -41,8 +41,6 @@ class DatabaseAdmin(admin.ModelAdmin):
     list_filter = ('host', 'project', 'environment')
     autocomplete_fields = ('host', 'project', 'environment')
 
-    change_list_template = 'admin/change_list.html'
-
 
 admin.site.register(Database, DatabaseAdmin)
 
