@@ -5,6 +5,20 @@
 {% block content %}
   <div id="content-main">
     <div id="changelist-filter">
+        {% block object-tools %}
+            <ul class="object-tools">
+              {% block object-tools-items %}
+                {% change_list_object_tools %}
+              {% endblock %}
+            </ul>
+        {% endblock %}
+        {% if cl.formset and cl.formset.errors %}
+            <p class="errornote">
+            {% blocktranslate count counter=cl.formset.total_error_count %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+            </p>
+            {{ cl.formset.non_form_errors }}
+        {% endif %}
+
       <h2> Search </h2>
 
       {% block search %}{% search_form cl %}{% endblock %}
@@ -31,6 +45,8 @@
     </div>
     <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
       <div class="changelist-form-container">
+        {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}
+
         <form id="changelist-form" method="post"{% if cl.formset and cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %} novalidate>{% csrf_token %}
         {% if cl.formset %}
           <div>{{ cl.formset.management_form }}</div>
