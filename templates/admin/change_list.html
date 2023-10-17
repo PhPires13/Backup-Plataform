@@ -2,6 +2,10 @@
 
 {% load i18n admin_urls static admin_list %}  {# Load the required libraries #}
 
+{% block extrahead %}
+    <link rel="stylesheet" type="text/css" href="custom.css">
+{% endblock %}
+
 {% block content %}
   <div id="content-main">
       {% block object-tools %}
@@ -38,7 +42,7 @@
 
         {% if cl.has_active_filters %}
         <h3>
-          <a href="{{ cl.clear_all_filters_qs }}"> <i class="fa-solid fa-eraser"></i> {% translate "Clear" %}</a>
+          <a class="clear-button" href="{{ cl.clear_all_filters_qs }}"> <i class="fa-solid fa-eraser"></i> {% translate "Clear" %}</a>
         </h3>
         {% endif %}
     </div>
