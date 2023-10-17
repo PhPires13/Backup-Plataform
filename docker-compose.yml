@@ -18,7 +18,7 @@ services:
     depends_on:
       - redis
     volumes:
-      - .:/mnt
+      - /mnt:/mnt
 
   celery-beat:
     build: .
