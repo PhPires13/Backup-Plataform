@@ -18,16 +18,16 @@
           {% endif %}
         </h3>
         {% endif %}
+      </div>
+      {% endif %}
+
+      {% for spec in cl.filter_specs %} {% admin_list_filter cl spec %} {% endfor %}
 
         {% if cl.has_active_filters %}
         <h3>
           <a href="{{ cl.clear_all_filters_qs }}">&#10006; {% translate "Clear all filters" %}</a>
         </h3>
         {% endif %}
-      </div>
-      {% endif %}
-
-      {% for spec in cl.filter_specs %} {% admin_list_filter cl spec %} {% endfor %}
     </div>
     <div class="module{% if cl.has_filters %} filtered{% endif %}" id="changelist">
       <div class="changelist-form-container">
