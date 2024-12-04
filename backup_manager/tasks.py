@@ -3,7 +3,7 @@ import subprocess
 
 import psycopg2
 from celery import shared_task
-from django.utils import timezone
+from celery.worker.control import revoke
 
 from backup_manager.models import Database, Backup, Restore, STATUS, Environment
 
@@ -21,16 +21,6 @@ def database_connect(database: Database, user: str, password: str) -> (psycopg2.
     return connection, cursor
 
 
-def get_pg_version(database: Database, user: str, password: str) -> str:
-    connection, cursor = database_connect(database, user, password)
-    cursor.execute('SELECT version() ;')
-    pg_version = cursor.fetchone()[0].split(' ')[1]
-    cursor.close()
-    connection.close()
-
-    return pg_version
-
-
 def run_command(obj, command: list, password: str):
     # Set the postgres password as an environment variable
     os.environ['PGPASSWORD'] = password
@@ -39,7 +29,7 @@ def run_command(obj, command: list, password: str):
     try:
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, input=password, check=True, encoding='utf-8')
         # Set the status and description after a success
-        status= STATUS.SUCCESS
+        status = STATUS.SUCCESS
         description = result.stdout
     except subprocess.CalledProcessError as e:
         # Set the status and description after a fail
@@ -70,18 +60,9 @@ def perform_backup(backup_id: int, user: str, password: str, already_started: bo
     # Create the directory structure if it doesn't exist
     os.makedirs(os.path.dirname(backup.complete_path()), exist_ok=True)
 
-    # Get the postgres version
-    try:
-        pg_version = get_pg_version(database, user, password)
-    except Exception as e:
-        # Set the status and description after a fail
-        backup.finish_task(STATUS.FAILED, str(e))
-        return
-
     # Construct the pg_dump command
     command = [
         'pg_dump',
-        '-V', pg_version,
         '-h', host.ip,
         '-p', str(host.port),
         '-U', user,
@@ -131,7 +112,7 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
                 schema_name = row[0]
                 if to_ignore_public_schema and schema_name == 'public':  # Verify if the public schema should be ignored
                     continue
-                cursor.execute(f"ALTER SCHEMA {schema_name} RENAME TO {schema_name}_old_{restore.dt_create.strftime('%d_%m_%Y_%H_%M')} ;")
+                cursor.execute(f"ALTER SCHEMA {schema_name} RENAME TO {schema_name}_old_{restore.dt_reference.strftime('%d_%m_%Y_%H_%M')} ;")
         except Exception as e:
             # Set the status and description after a fail
             restore.finish_task(STATUS.FAILED, str(e))
@@ -141,9 +122,9 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
             # Reset the destination database using Django's database management functions
             # Terminate all connections to the database
             cursor.execute(f"""
-                SELECT pg_terminate_backend(pg_stat_activity.pid)
-                FROM pg_stat_activity
-                WHERE pg_stat_activity.datname = '{destination_database.name}' ;
+            SELECT pg_terminate_backend(pg_stat_activity.pid)
+            FROM pg_stat_activity
+            WHERE pg_stat_activity.datname = '{destination_database.name}' ;
             """)
             cursor.execute(f'DROP DATABASE IF EXISTS {destination_database.name} ;')
             cursor.execute(f'CREATE DATABASE {destination_database.name} ;')
@@ -160,17 +141,9 @@ def perform_restore(restore_id: int, user: str, password: str, to_keep_old_data:
         restore.finish_task(STATUS.FAILED, str(e))
         return
 
-    try:
-        pg_version = get_pg_version(destination_database, user, password)
-    except Exception as e:
-        # Set the status and description after a fail
-        restore.finish_task(STATUS.FAILED, str(e))
-        return
-
     # Construct the pg_restore command
     command = [
         'psql',
-        '-V', pg_version,
         '-h', host.ip,
         '-p', str(host.port),
         '-U', user,
@@ -219,3 +192,33 @@ def backup_environment(environment_id: int):
     # Create a backup for each database
     for database in databases:
         create_backup.delay(database.id)
+
+
+@shared_task
+def revoke_task(task_id: int, task_type: str):
+    if task_type == Backup.__name__:
+        task = Backup.objects.get(id=task_id)
+    elif task_type == Restore.__name__:
+        task = Restore.objects.get(id=task_id)
+    else:
+        return
+
+    initial_status = task.status
+
+    task.set_status(STATUS.REVOKING.value)
+    task.save()
+
+    try:
+        result = revoke('ALL', task.task_id, terminate=True, wait=True)
+    except Exception as e:
+        task.set_status(initial_status)
+        task.description = f'Error while revoking task: {str(e)}'
+        task.save()
+        return
+
+    if result.get('ok'):
+        task.delete()
+    else:
+        task.set_status(initial_status)
+        task.description = f'Error while revoking task: {result.get("error")}'
+        task.save()

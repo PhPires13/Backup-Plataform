@@ -14,7 +14,7 @@ from django_cryptography.fields import encrypt
 
 
 class Project(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, verbose_name='Name')
 
     def __str__(self):
         return self.name
@@ -24,7 +24,7 @@ class Project(models.Model):
 
 
 class Environment(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, verbose_name='Name')
 
     def __str__(self):
         return self.name
@@ -34,11 +34,11 @@ class Environment(models.Model):
 
 
 class Host(models.Model):
-    name = models.CharField(max_length=255)
-    ip = models.CharField(max_length=255)
-    port = models.IntegerField()
-    user = models.CharField(max_length=255, null=True, blank=True, help_text='User used in periodic tasks')
-    password = encrypt(models.CharField(max_length=255, null=True, blank=True, help_text='Password of user used in periodic tasks (encrypted)'))
+    name = models.CharField(max_length=255, verbose_name='Name')
+    ip = models.CharField(max_length=255, verbose_name='IP')
+    port = models.IntegerField(verbose_name='Port')
+    user = models.CharField(max_length=255, null=True, blank=True, help_text='User used in periodic tasks', verbose_name='User')
+    password = encrypt(models.CharField(max_length=255, null=True, blank=True, help_text='Password of user used in periodic tasks (encrypted)', verbose_name='Password'))
 
     def __str__(self):
         return f'{self.name} ({self.ip}:{self.port})'
@@ -48,12 +48,12 @@ class Host(models.Model):
 
 
 class Database(models.Model):
-    name = models.CharField(max_length=255)
-    host = models.ForeignKey(Host, on_delete=models.CASCADE)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
-    user = models.CharField(max_length=255, null=True, blank=True, help_text='Overwrite the user used in periodic tasks')
-    password = encrypt(models.CharField(max_length=255, null=True, blank=True, help_text='Overwrite the password of user used in periodic tasks (encrypted)'))
+    name = models.CharField(max_length=255, verbose_name='Name')
+    host = models.ForeignKey(Host, on_delete=models.CASCADE, verbose_name='Host')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, verbose_name='Project')
+    environment = models.ForeignKey(Environment, on_delete=models.CASCADE, verbose_name='Environment')
+    user = models.CharField(max_length=255, null=True, blank=True, help_text='Overwrite the user used in periodic tasks', verbose_name='User')
+    password = encrypt(models.CharField(max_length=255, null=True, blank=True, help_text='Overwrite the password of user used in periodic tasks (encrypted)', verbose_name='Password'))
 
     def __str__(self):
         return f'{self.name} ({self.project.name} - {self.environment.name})'
@@ -70,6 +70,7 @@ class STATUS(Enum):
     FAILED = 'FL'
     MANUAL = 'MN'
     SCHEDULED = 'SD'
+    REVOKING = 'RV'
 
 
 STATUS_CHOICES = (
@@ -79,16 +80,17 @@ STATUS_CHOICES = (
     (STATUS.FAILED.value, STATUS.FAILED.name),
     (STATUS.MANUAL.value, STATUS.MANUAL.name),
     (STATUS.SCHEDULED.value, STATUS.SCHEDULED.name),
+    (STATUS.REVOKING.value, STATUS.REVOKING.name),
 )
 
 
 class TaskModel(models.Model):
-    task_id = models.CharField(max_length=255, null=True, blank=True)
-    dt_create = models.DateTimeField(auto_now_add=True)
-    dt_start = models.DateTimeField(null=True, blank=True)
-    dt_end = models.DateTimeField(null=True, blank=True)
-    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=STATUS.PENDING.value)
-    description = models.TextField(null=True, blank=True)
+    task_id = models.CharField(max_length=255, null=True, blank=True, verbose_name='Celery Task ID')
+    dt_reference = models.DateTimeField(auto_now_add=True, verbose_name='Reference Date')
+    dt_start = models.DateTimeField(null=True, blank=True, verbose_name='Start Date')
+    dt_end = models.DateTimeField(null=True, blank=True, verbose_name='End Date')
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default=STATUS.PENDING.value, verbose_name='Execution Status')
+    description = models.TextField(null=True, blank=True, verbose_name='Return Description')
 
     def is_running(self) -> bool:
         if self.status == STATUS.STARTED.value:
@@ -132,63 +134,34 @@ class TaskModel(models.Model):
         self.description = description
         self.save()
 
-    def clean(self):
-        super().clean()
-
-        # If it already has a task_id, revoke the task
-        if self.task_id and not self.is_running():
-            try:
-                result = AsyncResult(self.task_id)
-                if result.state != 'STARTED':
-                    result.revoke(terminate=True, wait=True, timeout=15)
-            except Exception as e:
-                raise ValidationError(f'Error revoking task: {e}')
-            else:
-                raise ValidationError(f'The task is already running, wait for it to finish!')
-        elif self.is_running():
-            raise ValidationError(f'The task is already running, wait for it to finish!')
-
-    def delete(self, using=None, keep_parents=False):
-        # If it already has a task_id, revoke the task
-        if self.task_id:
-            try:
-                result = AsyncResult(self.task_id)
-                if result.state == 'STARTED':
-                    raise ProtectedError(f'The task is already running, wait for it to finish!')
-                result.revoke(terminate=True, wait=True, timeout=15)
-            except Exception as e:
-                raise ProtectedError(f'Error revoking task: {e}')
-
-        super().delete(using, keep_parents)
-
     class Meta:
         abstract = True
 
 
 class Backup(TaskModel):
-    name = models.CharField(max_length=255, blank=True, help_text='Default: "{project.name}_{environment.name}_{date_time}"')
-    path = models.CharField(max_length=255)
-    database = models.ForeignKey(Database, on_delete=models.CASCADE)
-    dt_create = models.DateTimeField(blank=True, help_text='Leave it _blank_ if the backup is to be done now  | Set it to a future date if the backup is to be scheduled  | Set it to a past date if the backup is already done')
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "{project.name}_{environment.name}_{date_time}"', verbose_name='Name')
+    path = models.CharField(max_length=255, verbose_name='Path')
+    database = models.ForeignKey(Database, on_delete=models.CASCADE, verbose_name='Database')
+    dt_reference = models.DateTimeField(blank=True, help_text='Leave it _blank_ if the backup is to be done now  | Set it to a future date if the backup is to be scheduled  | Set it to a past date if the backup is already done', verbose_name='Reference Date')
 
     def __str__(self):
-        return f'{self.name} ({self.database}) [{self.dt_create}] {{{self.status}}}'
+        return f'{self.name} ({self.database}) [{self.dt_reference}] {{{self.status}}}'
 
     def complete_path(self) -> str:
         default = os.path.join('/', 'mnt', 'netapp01', 'postgres')
-        month_year = self.dt_create.strftime('%m-%Y')
+        month_year = self.dt_reference.strftime('%m-%Y')
         path = os.path.join(default, self.database.environment.name, month_year, self.database.project.name, self.path)
         return path
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if not self.pk:  # If the object is being created
-            # If the creation date is already set
-            if not self.dt_create:
-                self.dt_create = timezone.now()
+            # If the reference date is already set
+            if not self.dt_reference:
+                self.dt_reference = timezone.now()
             else:
                 self.set_status(STATUS.MANUAL.value)  # The backup is already done
 
-        date_time: str = self.dt_create.strftime('%d-%m-%Y-%H-%M')
+        date_time: str = self.dt_reference.strftime('%d-%m-%Y-%H-%M')
 
         # If the name is blank, set default
         if not self.name:
@@ -196,8 +169,8 @@ class Backup(TaskModel):
 
         self.path = f'{self.database.project.name}_{self.database.name}_{date_time}.sql'  # Set the path
 
-        # If the creation date is in the future
-        if self.dt_create > timezone.now():
+        # If the reference date is in the future
+        if self.dt_reference > timezone.now():
             self.set_status(STATUS.SCHEDULED.value)  # The backup is scheduled
 
         super().save(force_insert, force_update, using, update_fields)
@@ -207,12 +180,12 @@ class Backup(TaskModel):
 
 
 class Restore(TaskModel):
-    name = models.CharField(max_length=255, blank=True, help_text='Default: "{origin_backup} -> {destination_database}"')
-    origin_backup = models.ForeignKey(Backup, on_delete=models.CASCADE)
-    destination_database = models.ForeignKey(Database, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "{origin_backup} -> {destination_database}"', verbose_name='Name')
+    origin_backup = models.ForeignKey(Backup, on_delete=models.CASCADE, verbose_name='Origin Backup')
+    destination_database = models.ForeignKey(Database, on_delete=models.CASCADE, verbose_name='Destination Database')
 
     def __str__(self):
-        return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_create}] {{{self.status}}}'
+        return f'{self.name} (({self.origin_backup}) -> {self.destination_database.name}) [{self.dt_reference}] {{{self.status}}}'
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # If the name is blank, set default
@@ -237,8 +210,8 @@ class Restore(TaskModel):
 
 
 class PeriodicTaskModel(models.Model):
-    name = models.CharField(max_length=255)
-    periodic_task = models.OneToOneField(to=PeriodicTask, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=255, verbose_name='Name')
+    periodic_task = models.OneToOneField(to=PeriodicTask, on_delete=models.CASCADE, null=True, blank=True, verbose_name='Celery Periodic Task')
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.periodic_task.name = self.name
@@ -256,8 +229,8 @@ class PeriodicTaskModel(models.Model):
 
 
 class PeriodicDatabaseBackup(PeriodicTaskModel):
-    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {database.project.name} - {database.environment.name} ({database.name}) [{self.periodic_task.crontab.human_readable}]"')
-    database = models.ForeignKey(Database, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {database.project.name} - {database.environment.name} ({database.name}) [{self.periodic_task.crontab.human_readable}]"', verbose_name='Name')
+    database = models.ForeignKey(Database, on_delete=models.CASCADE, verbose_name='Database')
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # If the name is blank, set default
@@ -284,8 +257,8 @@ class PeriodicDatabaseBackup(PeriodicTaskModel):
 
 
 class PeriodicEnvironmentBackup(PeriodicTaskModel):
-    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {environment.name} [{self.periodic_task.crontab.human_readable}]"')
-    environment = models.ForeignKey(Environment, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, blank=True, help_text='Default: "Backup {environment.name} [{self.periodic_task.crontab.human_readable}]"', verbose_name='Name')
+    environment = models.ForeignKey(Environment, on_delete=models.CASCADE, verbose_name='Environment')
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         # If the name is blank, set default
